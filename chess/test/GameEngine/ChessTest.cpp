@@ -8,10 +8,10 @@ TEST_CASE("The game starts with zero moves") {
 
 TEST_CASE("Can tell you where pieces are") {
     Chess chess;
-    REQUIRE(chess.getPiece("a2") == "p0");
-    REQUIRE(chess.getPiece("a1") == "r0");
-    REQUIRE(chess.getPiece("a7") == "p1");
-    REQUIRE(chess.getPiece("a8") == "r1");
-    REQUIRE(chess.getPiece("c8") == "b0");
-    REQUIRE(chess.getPiece("d1") == "q0");
+    REQUIRE(chess.getPiece("a2").toString() == "p0");
+    REQUIRE(chess.getPiece("a1").toString() == "r0");
+    REQUIRE(chess.getPiece("a7").toString() == "p1");
+    REQUIRE(chess.getPiece("a8").toString() == "r1");
+    REQUIRE(chess.getPiece("c8").toString() == "b1");
+    REQUIRE(chess.getPiece("d1").toString() == "q0");
 }
