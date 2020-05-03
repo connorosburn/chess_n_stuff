@@ -16,6 +16,21 @@ TEST_CASE("Can tell you where pieces are") {
     REQUIRE(chess.getPiece("d1").toString() == "q0");
 }
 
+TEST_CASE("Increments the turn counter") {
+    Chess chess;
+    REQUIRE(chess.getTurnCount() == 0);
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(chess.getTurnCount() == 1);
+    REQUIRE(chess.move("c7", "c5"));
+    REQUIRE(chess.getTurnCount() == 2);
+}
+
+TEST_CASE("Does not allow a player to move out of turn") {
+    Chess chess;
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(!chess.move("b2", "b4"));
+}
+
 TEST_CASE("Allows a pawn to move twice on its first move") {
     Chess chess;
     REQUIRE(chess.move("a2", "a4"));
@@ -51,4 +66,26 @@ TEST_CASE("Allows rooks to move properly") {
     REQUIRE(chess.move("a8", "a6"));
     REQUIRE(chess.move("a3", "c3"));
     REQUIRE(chess.move("a6", "c6"));
+}
+
+TEST_CASE("Does not allow rooks to move improperly") {
+    Chess chess;
+    REQUIRE(chess.move("b2", "b3"));
+    REQUIRE(!chess.move("a1", "b2"));
+}
+
+TEST_CASE("Allows bishops to move properly") {
+    Chess chess;
+    REQUIRE(chess.move("b2", "b3"));
+    REQUIRE(chess.move("d7", "d6"));
+    REQUIRE(chess.move("c1", "a3"));
+    REQUIRE(chess.move("c8", "h3"));
+}
+
+TEST_CASE("Does not allow bishops to move improperly") {
+    Chess chess;
+    REQUIRE(chess.move("c2", "c4"));
+    REQUIRE(chess.move("c7", "c5"));
+    REQUIRE(!chess.move("c1", "c3"));
+    REQUIRE(!chess.move("c8", "c6"));
 }

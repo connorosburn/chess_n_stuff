@@ -11,6 +11,7 @@ class ChessPiece {
         std::string toString();
         bool isNull();
         int getPlayer();
+        char getType();
         bool hasMoved();
         void move();
     private:

@@ -49,6 +49,10 @@ ChessPosition ChessPosition::operator+(const ChessPosition& position) {
     return ChessPosition(x + position.x, y + position.y);
 }
 
+void ChessPosition::operator+=(const ChessPosition& position) {
+    *this = *this + position;
+}
+
 ChessPosition ChessPosition::operator*(int multiplier) {
     return ChessPosition(x * multiplier, y * multiplier);
 }

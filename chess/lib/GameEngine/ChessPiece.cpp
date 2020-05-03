@@ -50,6 +50,10 @@ int ChessPiece::getPlayer() {
     return player;
 }
 
+char ChessPiece::getType() {
+    return type;
+}
+
 bool ChessPiece::hasMoved() {
     return moved;
 }

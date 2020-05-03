@@ -1,11 +1,15 @@
 #include "Chess.hpp"
 
-Chess::Chess(): board(defaultBoard) {
+Chess::Chess(): board(defaultBoard), turnCount(0) {
 
 }
 
 int Chess::getTurnCount() {
-    return 0;
+    return turnCount;
+}
+
+int Chess::playerTurn() {
+    return turnCount % 2;
 }
 
 ChessPiece Chess::getPiece(std::string position) {
@@ -30,20 +34,38 @@ bool Chess::move(ChessPosition start, ChessPosition end) {
         piece(end) = piece(start);
         piece(start) = ChessPiece();
         piece(end).move();
+        turnCount++;
     }
     return valid;
 }
 
 bool Chess::moveValid(ChessPosition start, ChessPosition end) {
-    std::vector<ChessPosition> moves = everyOpenMoveFrom(start);
-    return std::any_of(moves.begin(), moves.end(),
-        [end](ChessPosition position) {
-            return position == end;
-        }
-    );
+    bool valid = piece(start).getPlayer() == playerTurn();
+    if(valid) {
+        std::vector<ChessPosition> moves = everyOpenMoveFrom(start);
+        valid = std::any_of(moves.begin(), moves.end(),
+            [end](ChessPosition position) {
+                return position == end;
+            }
+        );
+    }
+    return valid;
 }
 
 std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
+    std::vector<ChessPosition> positions;
+    switch(piece(start).getType()) {
+        case 'p':
+            positions = pawnMoves(start);
+            break;
+        case 'r':
+            positions = rookMoves(start);
+            break;
+    }
+    return positions;
+}
+
+std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
     int yDirection;
     if(piece(start).getPlayer() == 0) {
         yDirection = -1;
@@ -75,4 +97,24 @@ std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
     }
 
     return positions;
+}
+
+std::vector<ChessPosition> Chess::searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors) {
+    std::vector<ChessPosition> positions;
+    for(auto vector : searchVectors) {
+        auto positionOpen = [this](ChessPosition position) -> bool {
+            return position.onBoard() && this->piece(position).isNull();
+        };
+        for(ChessPosition position = start + vector; positionOpen(position); position += vector) {
+            positions.push_back(position);
+        }
+    }
+    return positions;
+}
+
+std::vector<ChessPosition> Chess::rookMoves(ChessPosition start) {
+    std::vector<ChessPosition> searchVectors {
+        {ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1)}
+    };
+    return searchAlongVectors(start, searchVectors);
 }

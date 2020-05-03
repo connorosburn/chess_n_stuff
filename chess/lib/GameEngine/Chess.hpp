@@ -25,16 +25,21 @@ class Chess {
     public:
         Chess();
         int getTurnCount();
+        int playerTurn();
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
         bool move(std::string start, std::string end);
         bool move(ChessPosition start, ChessPosition end);
 
     private:
+        int turnCount;
         ChessPiece& piece(ChessPosition position);
         std::array<std::array<ChessPiece, boardSize>, boardSize> board;
         bool moveValid(ChessPosition start, ChessPosition end);
         std::vector<ChessPosition> everyOpenMoveFrom(ChessPosition start);
+        std::vector<ChessPosition> pawnMoves(ChessPosition start);
+        std::vector<ChessPosition> searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors);
+        std::vector<ChessPosition> rookMoves(ChessPosition start);
 };
 
 #endif

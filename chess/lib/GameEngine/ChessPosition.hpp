@@ -14,6 +14,7 @@ class ChessPosition {
         bool onBoard();
         bool operator==(const ChessPosition& position);
         ChessPosition operator+(const ChessPosition& position);
+        void operator+=(const ChessPosition& position);
         ChessPosition operator*(int multiplier);
 
     private:
