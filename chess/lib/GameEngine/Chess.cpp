@@ -61,6 +61,9 @@ std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
         case 'r':
             positions = rookMoves(start);
             break;
+        case 'b':
+            positions = bishopMoves(start);
+            break;
     }
     return positions;
 }
@@ -115,6 +118,13 @@ std::vector<ChessPosition> Chess::searchAlongVectors(ChessPosition start, std::v
 std::vector<ChessPosition> Chess::rookMoves(ChessPosition start) {
     std::vector<ChessPosition> searchVectors {
         {ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1)}
+    };
+    return searchAlongVectors(start, searchVectors);
+}
+
+std::vector<ChessPosition> Chess::bishopMoves(ChessPosition start) {
+    std::vector<ChessPosition> searchVectors {
+        {ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)}
     };
     return searchAlongVectors(start, searchVectors);
 }

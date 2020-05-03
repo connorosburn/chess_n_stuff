@@ -40,6 +40,7 @@ class Chess {
         std::vector<ChessPosition> pawnMoves(ChessPosition start);
         std::vector<ChessPosition> searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors);
         std::vector<ChessPosition> rookMoves(ChessPosition start);
+        std::vector<ChessPosition> bishopMoves(ChessPosition start);
 };
 
 #endif
