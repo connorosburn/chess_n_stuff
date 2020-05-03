@@ -30,3 +30,25 @@ TEST_CASE("Does not allow a pawn to move twice after the first move") {
     REQUIRE(chess.move("c7", "c5"));
     REQUIRE(!chess.move("a4", "a6"));
 }
+
+TEST_CASE("Does not allow a pawn to move diagonally under normal circumstances") {
+    Chess chess;
+    REQUIRE(!chess.move("a2", "b3"));
+}
+
+TEST_CASE("Allows a pawn to capture") {
+    Chess chess;
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(chess.move("b7", "b5"));
+    REQUIRE(chess.move("a4", "b5"));
+}
+
+TEST_CASE("Allows rooks to move properly") {
+    Chess chess;
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(chess.move("a7", "a5"));
+    REQUIRE(chess.move("a1", "a3"));
+    REQUIRE(chess.move("a8", "a6"));
+    REQUIRE(chess.move("a3", "c3"));
+    REQUIRE(chess.move("a6", "c6"));
+}
