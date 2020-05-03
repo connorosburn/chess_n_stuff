@@ -89,3 +89,16 @@ TEST_CASE("Does not allow bishops to move improperly") {
     REQUIRE(!chess.move("c1", "c3"));
     REQUIRE(!chess.move("c8", "c6"));
 }
+
+TEST_CASE("Allows queen to move properly") {
+    Chess chess;
+
+    REQUIRE(chess.move("d2", "d4"));
+    REQUIRE(chess.move("d7", "d5"));
+
+    REQUIRE(chess.move("d1", "d3"));
+    REQUIRE(chess.move("d8", "d6"));
+
+    REQUIRE(chess.move("d3", "a6"));
+    REQUIRE(chess.move("d6", "g3"));
+}
