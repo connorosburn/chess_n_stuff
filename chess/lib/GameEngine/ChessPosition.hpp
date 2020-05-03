@@ -11,6 +11,10 @@ class ChessPosition {
         ChessPosition(int xValue, int yValue);
         int x;
         int y;
+        bool onBoard();
+        bool operator==(const ChessPosition& position);
+        ChessPosition operator+(const ChessPosition& position);
+        ChessPosition operator*(int multiplier);
 
     private:
         bool notationStringValid(std::string notationString);

@@ -36,3 +36,19 @@ void ChessPosition::valuesFromString(std::string notationString) {
     x = std::distance(letteredPositions.begin(), position);
     y = boardSize - std::stoi(notationString.substr(1, 1));
 }
+
+bool ChessPosition::onBoard() {
+    return x >= 0 && x < boardSize && y >= 0 && y < boardSize;
+}
+
+bool ChessPosition::operator==(const ChessPosition& position) {
+    return x == position.x && y == position.y;
+}
+
+ChessPosition ChessPosition::operator+(const ChessPosition& position) {
+    return ChessPosition(x + position.x, y + position.y);
+}
+
+ChessPosition ChessPosition::operator*(int multiplier) {
+    return ChessPosition(x * multiplier, y * multiplier);
+}

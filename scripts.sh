@@ -14,3 +14,8 @@ function buildtests() {
 }
 
 alias runtests='./tests'
+
+function test() {
+    buildtests
+    runtests
+}

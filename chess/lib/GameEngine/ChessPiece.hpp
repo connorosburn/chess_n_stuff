@@ -10,11 +10,14 @@ class ChessPiece {
         ChessPiece();
         std::string toString();
         bool isNull();
-
+        int getPlayer();
+        bool hasMoved();
+        void move();
     private:
         int player;
         char type;
         bool null;
+        bool moved;
         bool pieceValid(char pieceType, int playerNumber);
 };
 

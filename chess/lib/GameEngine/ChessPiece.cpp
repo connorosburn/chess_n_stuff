@@ -9,7 +9,7 @@ ChessPiece::ChessPiece(std::string pieceType): null(false) {
 
 }
 
-ChessPiece::ChessPiece(char pieceType, int playerNumber): null(false) {
+ChessPiece::ChessPiece(char pieceType, int playerNumber): null(false), moved(false) {
     pieceType = std::tolower(pieceType);
     if(pieceValid(pieceType, playerNumber)) {
         type = pieceType;
@@ -44,4 +44,16 @@ std::string ChessPiece::toString() {
 
 bool ChessPiece::isNull() {
     return null;
+}
+
+int ChessPiece::getPlayer() {
+    return player;
+}
+
+bool ChessPiece::hasMoved() {
+    return moved;
+}
+
+void ChessPiece::move() {
+    moved = true;
 }

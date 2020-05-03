@@ -3,6 +3,7 @@
 
 #include <string>
 #include <array>
+#include <vector>
 
 #include "ChessPosition.hpp"
 #include "ChessPiece.hpp"
@@ -26,10 +27,14 @@ class Chess {
         int getTurnCount();
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
+        bool move(std::string start, std::string end);
+        bool move(ChessPosition start, ChessPosition end);
 
     private:
         ChessPiece& piece(ChessPosition position);
         std::array<std::array<ChessPiece, boardSize>, boardSize> board;
+        bool moveValid(ChessPosition start, ChessPosition end);
+        std::vector<ChessPosition> everyOpenMoveFrom(ChessPosition start);
 };
 
 #endif
