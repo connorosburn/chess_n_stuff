@@ -102,3 +102,12 @@ TEST_CASE("Allows queen to move properly") {
     REQUIRE(chess.move("d3", "a6"));
     REQUIRE(chess.move("d6", "g3"));
 }
+
+TEST_CASE("Allows knight to move properly") {
+    Chess chess;
+
+    REQUIRE(chess.move("b1", "a3"));
+    REQUIRE(chess.move("g8", "h6"));
+    REQUIRE(chess.move("a3", "c4"));
+    REQUIRE(chess.move("h6", "f5"));
+}

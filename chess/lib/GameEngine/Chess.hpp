@@ -39,9 +39,11 @@ class Chess {
         std::vector<ChessPosition> everyOpenMoveFrom(ChessPosition start);
         std::vector<ChessPosition> pawnMoves(ChessPosition start);
         std::vector<ChessPosition> searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors);
+        std::vector<ChessPosition> checkIndividualOffsets(ChessPosition start, std::vector<ChessPosition> offsets);
         std::vector<ChessPosition> rookMoves(ChessPosition start);
         std::vector<ChessPosition> bishopMoves(ChessPosition start);
         std::vector<ChessPosition> queenMoves(ChessPosition start);
+        std::vector<ChessPosition> knightMoves(ChessPosition start);
 };
 
 #endif
