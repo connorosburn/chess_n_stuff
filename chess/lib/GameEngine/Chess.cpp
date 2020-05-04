@@ -70,6 +70,9 @@ std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
         case 'n':
             positions = knightMoves(start);
             break;
+        case 'k':
+            positions = kingMoves(start);
+            break;
     }
     return positions;
 }
@@ -158,6 +161,14 @@ std::vector<ChessPosition> Chess::knightMoves(ChessPosition start) {
     std::vector<ChessPosition> offsets {
         {ChessPosition(2, 1), ChessPosition(-2, 1), ChessPosition(2, -1), ChessPosition(-2, -1),
         ChessPosition(1, 2), ChessPosition(-1, 2), ChessPosition(1, -2), ChessPosition(-1, -2)}
+    };
+    return checkIndividualOffsets(start, offsets);
+}
+
+std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
+    std::vector<ChessPosition> offsets {
+        {ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1),
+        ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)}
     };
     return checkIndividualOffsets(start, offsets);
 }

@@ -44,6 +44,7 @@ class Chess {
         std::vector<ChessPosition> bishopMoves(ChessPosition start);
         std::vector<ChessPosition> queenMoves(ChessPosition start);
         std::vector<ChessPosition> knightMoves(ChessPosition start);
+        std::vector<ChessPosition> kingMoves(ChessPosition start);
 };
 
 #endif
