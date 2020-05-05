@@ -181,15 +181,23 @@ std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
 
 bool Chess::inCheck(int playerNumber) {
     bool check = false;
-    for(int i = 0 ; i < board.size(); i++) {
-        for(int j = 0; j < board[i].size(); j++) {
-            if(!board[i][j].isNull() && board[i][j].getPlayer() != playerNumber) {
-                std::vector<ChessPosition> moves{everyOpenMoveFrom({j, i})};
-                check = check || std::any_of(moves.begin(), moves.end(), [playerNumber, this](ChessPosition m) {
-                    return this->piece(m).getType() == 'k' && this->piece(m).getPlayer() == playerNumber;
-                });
-            }
+    for(int i = 0 ; i < board.size() && !check; i++) {
+        for(int j = 0; j < board[i].size() && !check; j++) {
+            check = check || detectCheckFromPosition(j, i, playerNumber);
         }
+    }
+    return check;
+}
+
+bool Chess::detectCheckFromPosition(int x, int y, int player) {
+    bool check;
+    if(!board[y][x].isNull() && board[y][x].getPlayer() != player) {
+        std::vector<ChessPosition> moves{everyOpenMoveFrom({x, y})};
+        check = std::any_of(moves.begin(), moves.end(), [player, this](ChessPosition m) {
+            return this->piece(m).getType() == 'k' && this->piece(m).getPlayer() == player;
+        });
+    } else {
+        check = false;
     }
     return check;
 }
