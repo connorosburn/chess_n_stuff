@@ -190,14 +190,12 @@ bool Chess::inCheck(int playerNumber) {
 }
 
 bool Chess::detectCheckFromPosition(int x, int y, int player) {
-    bool check;
+    bool check = false;
     if(!board[y][x].isNull() && board[y][x].getPlayer() != player) {
         std::vector<ChessPosition> moves{everyOpenMoveFrom({x, y})};
         check = std::any_of(moves.begin(), moves.end(), [player, this](ChessPosition m) {
             return this->piece(m).getType() == 'k' && this->piece(m).getPlayer() == player;
         });
-    } else {
-        check = false;
     }
     return check;
 }
