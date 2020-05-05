@@ -82,13 +82,29 @@ std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
     return positions;
 }
 
-std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
-    int yDirection;
-    if(piece(start).getPlayer() == 0) {
-        yDirection = -1;
-    } else if(piece(start).getPlayer() == 1) {
-        yDirection = 1;
+int pawnDirection(int player) {
+    if(player == 0) {
+        return -1;
+    } else if(player == 1) {
+        return 1;
+    } else {
+        throw "Invalid player";
     }
+}
+
+void Chess::pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positions) {
+    int yDirection {pawnDirection(piece(start).getPlayer())};
+    const std::vector<ChessPosition> captureChecks = {ChessPosition(1, yDirection), ChessPosition(-1, yDirection)};
+    for(ChessPosition offset : captureChecks) {
+        ChessPosition position{start + offset};
+        if(position.onBoard() && !piece(position).isNull() && piece(position).getPlayer() != piece(start).getPlayer()) {
+            positions.push_back(position);
+        }
+    }
+}
+
+std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
+    int yDirection {pawnDirection(piece(start).getPlayer())};
 
     std::vector<ChessPosition> positions;
 
@@ -105,13 +121,7 @@ std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
         positions.push_back(doubleMove);
     }
 
-    std::vector<ChessPosition> captureChecks = {ChessPosition(1, yDirection), ChessPosition(-1, yDirection)};
-    for(ChessPosition offset : captureChecks) {
-        ChessPosition position{start + offset};
-        if(position.onBoard() && !piece(position).isNull() && piece(position).getPlayer() != piece(start).getPlayer()) {
-            positions.push_back(position);
-        }
-    }
+    pawnCaptures(start, positions);
 
     return positions;
 }
@@ -143,38 +153,48 @@ std::vector<ChessPosition> Chess::checkIndividualOffsets(ChessPosition start, st
 
 std::vector<ChessPosition> Chess::rookMoves(ChessPosition start) {
     std::vector<ChessPosition> searchVectors {
-        {ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1)}
+        {
+            ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1)
+        }
     };
     return searchAlongVectors(start, searchVectors);
 }
 
 std::vector<ChessPosition> Chess::bishopMoves(ChessPosition start) {
     std::vector<ChessPosition> searchVectors {
-        {ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)}
+        {
+            ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)
+        }
     };
     return searchAlongVectors(start, searchVectors);
 }
 
 std::vector<ChessPosition> Chess::queenMoves(ChessPosition start) {
     std::vector<ChessPosition> searchVectors {
-        {ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1),
-        ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)}
+        {
+            ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1),
+            ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)
+        }
     };
     return searchAlongVectors(start, searchVectors);
 }
 
 std::vector<ChessPosition> Chess::knightMoves(ChessPosition start) {
     std::vector<ChessPosition> offsets {
-        {ChessPosition(2, 1), ChessPosition(-2, 1), ChessPosition(2, -1), ChessPosition(-2, -1),
-        ChessPosition(1, 2), ChessPosition(-1, 2), ChessPosition(1, -2), ChessPosition(-1, -2)}
+        {
+            ChessPosition(2, 1), ChessPosition(-2, 1), ChessPosition(2, -1), ChessPosition(-2, -1),
+            ChessPosition(1, 2), ChessPosition(-1, 2), ChessPosition(1, -2), ChessPosition(-1, -2)
+        }
     };
     return checkIndividualOffsets(start, offsets);
 }
 
 std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
     std::vector<ChessPosition> offsets {
-        {ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1),
-        ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)}
+        {
+            ChessPosition(1, 0), ChessPosition(-1, 0), ChessPosition(0, 1), ChessPosition(0, -1),
+            ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)
+        }
     };
     return checkIndividualOffsets(start, offsets);
 }

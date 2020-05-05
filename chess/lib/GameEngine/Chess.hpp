@@ -46,6 +46,9 @@ class Chess {
         std::vector<ChessPosition> searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors);
         std::vector<ChessPosition> checkIndividualOffsets(ChessPosition start, std::vector<ChessPosition> offsets);
 
+        // helper methods for pawn movement
+        void pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positions);
+
         // searches for regular movement for each piece
         std::vector<ChessPosition> pawnMoves(ChessPosition start);
         std::vector<ChessPosition> rookMoves(ChessPosition start);

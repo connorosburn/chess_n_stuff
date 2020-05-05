@@ -41,18 +41,18 @@ bool ChessPosition::onBoard() const {
     return x >= 0 && x < boardSize && y >= 0 && y < boardSize;
 }
 
-bool ChessPosition::operator==(const ChessPosition& position) {
+bool ChessPosition::operator==(ChessPosition position) const {
     return x == position.x && y == position.y;
 }
 
-ChessPosition ChessPosition::operator+(const ChessPosition& position) {
+ChessPosition ChessPosition::operator+(ChessPosition position) const {
     return ChessPosition(x + position.x, y + position.y);
 }
 
-void ChessPosition::operator+=(const ChessPosition& position) {
+void ChessPosition::operator+=(ChessPosition position) {
     *this = *this + position;
 }
 
-ChessPosition ChessPosition::operator*(int multiplier) {
+ChessPosition ChessPosition::operator*(int multiplier) const {
     return ChessPosition(x * multiplier, y * multiplier);
 }

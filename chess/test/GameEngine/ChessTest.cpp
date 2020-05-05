@@ -147,3 +147,7 @@ TEST_CASE("It detects check") {
     REQUIRE(!chess.inCheck(1));
     REQUIRE(!chess.inCheck(0));
 }
+
+TEST_CASE("It detects when the game is over") {
+    
+}
