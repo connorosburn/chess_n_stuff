@@ -24,8 +24,10 @@ const std::array<std::array<ChessPiece, boardSize>, boardSize> defaultBoard {
 class Chess {
     public:
         Chess();
+        Chess(std::array<std::array<ChessPiece, boardSize>, boardSize> chessBoard, int turnNumber);
         int getTurnCount();
         int playerTurn();
+        bool inCheck(int playerNumber);
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
         bool move(std::string start, std::string end);

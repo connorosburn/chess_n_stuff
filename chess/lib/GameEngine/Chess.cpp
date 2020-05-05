@@ -1,6 +1,11 @@
 #include "Chess.hpp"
 
-Chess::Chess(): board(defaultBoard), turnCount(0) {
+Chess::Chess(std::array<std::array<ChessPiece, boardSize>, boardSize> chessBoard, int turnNumber):
+board(chessBoard), turnCount(turnNumber) {
+
+}
+
+Chess::Chess(): Chess(defaultBoard, 0) {
 
 }
 
@@ -114,11 +119,12 @@ std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
 std::vector<ChessPosition> Chess::searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors) {
     std::vector<ChessPosition> positions;
     for(auto vector : searchVectors) {
-        auto positionOpen = [this](ChessPosition position) -> bool {
-            return position.onBoard() && this->piece(position).isNull();
-        };
-        for(ChessPosition position = start + vector; positionOpen(position); position += vector) {
-            positions.push_back(position);
+        bool reachedEnd = false;
+        for(ChessPosition position = start + vector; !reachedEnd; position += vector) {
+            reachedEnd = !position.onBoard() || !this->piece(position).isNull(); 
+            if(position.onBoard() && (piece(position).isNull() || piece(position).getPlayer() != piece(start).getPlayer())) {
+                positions.push_back(position);
+            }
         }
     }
     return positions;
@@ -128,7 +134,7 @@ std::vector<ChessPosition> Chess::checkIndividualOffsets(ChessPosition start, st
     std::vector<ChessPosition> positions;
     for(auto offset : offsets) {
         ChessPosition position = start + offset;
-        if(piece(position).isNull() || piece(position).getPlayer() != piece(start).getPlayer()) {
+        if(position.onBoard() && (piece(position).isNull() || piece(position).getPlayer() != piece(start).getPlayer())) {
             positions.push_back(position);
         }
     }
@@ -171,4 +177,19 @@ std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
         ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)}
     };
     return checkIndividualOffsets(start, offsets);
+}
+
+bool Chess::inCheck(int playerNumber) {
+    bool check = false;
+    for(int i = 0 ; i < board.size(); i++) {
+        for(int j = 0; j < board[i].size(); j++) {
+            if(!board[i][j].isNull() && board[i][j].getPlayer() != playerNumber) {
+                std::vector<ChessPosition> moves{everyOpenMoveFrom({j, i})};
+                check = check || std::any_of(moves.begin(), moves.end(), [playerNumber, this](ChessPosition m) {
+                    return this->piece(m).getType() == 'k' && this->piece(m).getPlayer() == playerNumber;
+                });
+            }
+        }
+    }
+    return check;
 }

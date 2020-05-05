@@ -122,3 +122,28 @@ TEST_CASE("Allows king to move properly") {
     REQUIRE(chess.move("e2", "d3"));
     REQUIRE(chess.move("e7", "f6"));
 }
+
+const std::array<std::array<ChessPiece, boardSize>, boardSize> inCheckBoard {
+    {    
+        {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
+        {ChessPiece('p', 1), ChessPiece('b', 1), ChessPiece('p', 1), ChessPiece(), ChessPiece('q', 1), ChessPiece('q', 0), ChessPiece(), ChessPiece()},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('k', 1)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 1)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece()},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
+        {ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece()},
+        {ChessPiece('r', 0), ChessPiece('n', 0), ChessPiece('b', 0), ChessPiece(), ChessPiece('k', 0), ChessPiece(), ChessPiece(), ChessPiece('r', 0)}
+    }
+};
+
+TEST_CASE("It detects check") {
+    Chess chess(inCheckBoard, 0);
+
+    REQUIRE(chess.inCheck(1));
+    REQUIRE(!chess.inCheck(0));
+
+    chess = Chess();
+
+    REQUIRE(!chess.inCheck(1));
+    REQUIRE(!chess.inCheck(0));
+}

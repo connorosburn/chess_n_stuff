@@ -37,7 +37,7 @@ void ChessPosition::valuesFromString(std::string notationString) {
     y = boardSize - std::stoi(notationString.substr(1, 1));
 }
 
-bool ChessPosition::onBoard() {
+bool ChessPosition::onBoard() const {
     return x >= 0 && x < boardSize && y >= 0 && y < boardSize;
 }
 

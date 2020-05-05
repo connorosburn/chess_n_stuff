@@ -11,7 +11,7 @@ class ChessPosition {
         ChessPosition(int xValue, int yValue);
         int x;
         int y;
-        bool onBoard();
+        bool onBoard() const;
         bool operator==(const ChessPosition& position);
         ChessPosition operator+(const ChessPosition& position);
         void operator+=(const ChessPosition& position);
