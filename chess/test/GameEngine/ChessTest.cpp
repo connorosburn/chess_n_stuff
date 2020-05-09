@@ -123,7 +123,7 @@ TEST_CASE("Allows king to move properly") {
     REQUIRE(chess.move("e7", "f6"));
 }
 
-const std::array<std::array<ChessPiece, boardSize>, boardSize> inCheckBoard {
+const std::vector<std::vector<ChessPiece>> inCheckBoard {
     {    
         {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
         {ChessPiece('p', 1), ChessPiece('b', 1), ChessPiece('p', 1), ChessPiece(), ChessPiece('q', 1), ChessPiece('q', 0), ChessPiece(), ChessPiece()},
@@ -148,6 +148,32 @@ TEST_CASE("It detects check") {
     REQUIRE(!chess.inCheck(0));
 }
 
-TEST_CASE("It detects when the game is over") {
+const std::vector<std::vector<ChessPiece>> checkMateBoard {
+    {    
+        {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
+        {ChessPiece('p', 1), ChessPiece('b', 1), ChessPiece('p', 1), ChessPiece(), ChessPiece(), ChessPiece('q', 0), ChessPiece(), ChessPiece()},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('k', 1)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('q', 1), ChessPiece('r', 0)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece()},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
+        {ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece()},
+        {ChessPiece('r', 0), ChessPiece('n', 0), ChessPiece('b', 0), ChessPiece(), ChessPiece('k', 0), ChessPiece(), ChessPiece(), ChessPiece()}
+    }
+};
+
+TEST_CASE("It detects checkmate") {
+    Chess chess;
+
+    auto endState = chess.endState();
+
+    REQUIRE(endState.condition == "");
+    REQUIRE(endState.winner != 1);
+    REQUIRE(endState.winner != 0);
     
+    chess = Chess(checkMateBoard, 1);
+
+    endState = chess.endState();
+
+    REQUIRE(endState.condition == "checkmate");
+    REQUIRE(endState.winner == 0);
 }

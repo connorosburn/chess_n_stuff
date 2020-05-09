@@ -35,7 +35,7 @@ ChessPiece::ChessPiece(): null(true) {
 
 std::string ChessPiece::toString() {
     if(null) {
-        throw "Cannot convert string from null piece";
+        return "";
     }
     std::stringstream outputStream;
     outputStream << type << player;

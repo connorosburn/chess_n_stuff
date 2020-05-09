@@ -8,7 +8,7 @@
 #include "ChessPosition.hpp"
 #include "ChessPiece.hpp"
 
-const std::array<std::array<ChessPiece, boardSize>, boardSize> defaultBoard {
+const std::vector<std::vector<ChessPiece>> defaultBoard {
     {
         {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece('b', 1), ChessPiece('q', 1), ChessPiece('k', 1), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
         {ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1)},
@@ -21,22 +21,38 @@ const std::array<std::array<ChessPiece, boardSize>, boardSize> defaultBoard {
     }
 };
 
+struct EndState {
+    EndState(std::string endCondition, int gameWinner):
+        condition(endCondition), winner(gameWinner) {};
+    EndState(std::string endCondition):
+        EndState(endCondition, -1) {};
+    EndState():
+        EndState("", -1) {};
+    std::string condition;
+    int winner;
+};
+
 class Chess {
     public:
         Chess();
-        Chess(std::array<std::array<ChessPiece, boardSize>, boardSize> chessBoard, int turnNumber);
+        Chess(std::vector<std::vector<ChessPiece>> chessBoard, int turnNumber);
         int getTurnCount();
         int playerTurn();
-        bool inCheck(int playerNumber);
+        int otherPlayer();
+        bool inCheck(int player);
+        std::vector<std::vector<ChessPiece>> getBoard();
+        std::vector<ChessPosition> everyLegalMoveFrom(ChessPosition start);
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
         bool move(std::string start, std::string end);
         bool move(ChessPosition start, ChessPosition end);
+        EndState endState();
+        std::vector<ChessPosition> moveablePieces();
 
     private:
         int turnCount;
         ChessPiece& piece(ChessPosition position);
-        std::array<std::array<ChessPiece, boardSize>, boardSize> board;
+        std::vector<std::vector<ChessPiece>> board;
         bool moveValid(ChessPosition start, ChessPosition end);
 
         // will show all regular movement available from each position
@@ -58,6 +74,7 @@ class Chess {
         std::vector<ChessPosition> kingMoves(ChessPosition start);
 
         // helper method for check detection
+        bool hypotheticalCheck(ChessPosition start, ChessPosition end);
         bool detectCheckFromPosition(int x, int y, int player);
 };
 
