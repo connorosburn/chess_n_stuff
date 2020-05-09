@@ -12,7 +12,6 @@ function ChessBoard(props) {
 
     const tileSelectable = (x, y, piece) => {
         let selectable = false;
-        if(selectableTiles){console.log(selectableTiles.size())};
         if(selectableTiles) {
             for(let i = 0; i < selectableTiles.size(); i++) {
                 if(selectableTiles.get(i).x == x && selectableTiles.get(i).y == y) {
