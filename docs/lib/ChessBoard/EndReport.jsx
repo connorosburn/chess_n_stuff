@@ -4,7 +4,7 @@ function EndReport(props) {
 
     const report = (subject) => {
         if(subject) {
-            return <p>{subject}</p>
+            return <p className="end-text">{subject}</p>
         }
     }
 
