@@ -1,5 +1,4 @@
 import React from 'react';
-import '../style/ChessBoard.css';
 
 function EndReport(props) {
 

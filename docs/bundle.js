@@ -63,7 +63,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "1c56febcbe58fe9f8f31";
+/******/ 	var hotCurrentHash = "c9f4ea19dbcb933b9c74";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -949,7 +949,7 @@ eval("var api = __webpack_require__(/*! ../../node_modules/style-loader/dist/run
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("// Imports\nvar ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ \"./node_modules/css-loader/dist/runtime/api.js\");\nexports = ___CSS_LOADER_API_IMPORT___(false);\n// Module\nexports.push([module.i, \".chess-board {\\n    width: 500px;\\n    height: 500px;\\n    display: flex;\\n    flex-direction: column;\\n    align-items: space-evenly;\\n    justify-content: space-evenly;\\n}\\n\\n.board-row {\\n    display: flex;\\n    flex-direction: row;\\n    flex: 1;\\n    align-items: space-evenly;\\n    justify-content: space-evenly;\\n}\\n\\n.board-tile {\\n    width: 100%;\\n    height: 100%;\\n    border: none;\\n    flex: 1;\\n}\\n\\n.fill {\\n    width: 100%;\\n    height: 100%;\\n    border: none;\\n}\\n\\n.chess-piece {\\n    font-size: 300%;\\n}\\n\\n.light-tile {\\n    background-color: #EDD0A7;\\n}\\n\\n.dark-tile {\\n    background-color: #63421C;\\n}\\n\\n.selected-tile {\\n    background-color: #6f2da8;\\n}\\n\\n.selectable-tile {\\n    background-color: #bf00ff;\\n}\\n\\n.white {\\n    color: white;\\n}\\n\\n.black {\\n    color: black;\\n}\", \"\"]);\n// Exports\nmodule.exports = exports;\n\n\n//# sourceURL=webpack:///./lib/style/ChessBoard.css?./node_modules/css-loader/dist/cjs.js");
+eval("// Imports\nvar ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ \"./node_modules/css-loader/dist/runtime/api.js\");\nexports = ___CSS_LOADER_API_IMPORT___(false);\n// Module\nexports.push([module.i, \".chess-board {\\n    width: 750px;\\n    height: 750px;\\n\\n    position: absolute;\\n    top: 0;\\n    bottom: 0;\\n    left: 0;\\n    right: 0;\\n    margin: auto;\\n\\n    display: flex;\\n    flex-direction: column;\\n    align-items: space-evenly;\\n    justify-content: space-evenly;\\n}\\n\\n.board-row {\\n    display: flex;\\n    flex-direction: row;\\n    flex: 1;\\n    align-items: space-evenly;\\n    justify-content: space-evenly;\\n}\\n\\n.board-tile {\\n    width: 100%;\\n    height: 100%;\\n    border: none;\\n    flex: 1;\\n}\\n\\n.fill {\\n    width: 100%;\\n    height: 100%;\\n    border: none;\\n}\\n\\n.chess-piece {\\n    font-size: 300%;\\n}\\n\\n.light-tile {\\n    background-color: #EDD0A7;\\n}\\n\\n.dark-tile {\\n    background-color: #63421C;\\n}\\n\\n.selected-tile {\\n    background-color: #6f2da8;\\n}\\n\\n.selectable-tile {\\n    background-color: #bf00ff;\\n}\\n\\n.white {\\n    color: white;\\n}\\n\\n.black {\\n    color: black;\\n}\", \"\"]);\n// Exports\nmodule.exports = exports;\n\n\n//# sourceURL=webpack:///./lib/style/ChessBoard.css?./node_modules/css-loader/dist/cjs.js");
 
 /***/ }),
 

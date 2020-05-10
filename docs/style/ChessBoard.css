@@ -1,0 +1,65 @@
+.chess-board {
+    width: 750px;
+    height: 750px;
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: space-evenly;
+    justify-content: space-evenly;
+}
+
+.board-row {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    align-items: space-evenly;
+    justify-content: space-evenly;
+}
+
+.board-tile {
+    width: 100%;
+    height: 100%;
+    border: none;
+    flex: 1;
+}
+
+.fill {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.chess-piece {
+    font-size: 300%;
+}
+
+.light-tile {
+    background-color: #EDD0A7;
+}
+
+.dark-tile {
+    background-color: #63421C;
+}
+
+.selected-tile {
+    background-color: #6f2da8;
+}
+
+.selectable-tile {
+    background-color: #bf00ff;
+}
+
+.white {
+    color: white;
+}
+
+.black {
+    color: black;
+}

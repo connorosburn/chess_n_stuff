@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import ChessPiece from './ChessPiece.jsx';
 import EndReport from './EndReport.jsx';
-import '../style/ChessBoard.css';
 
 function ChessBoard(props) {
     const[selectedTile, setSelectedTile] = useState(null);
