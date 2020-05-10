@@ -1,6 +1,4 @@
 tests
 .vscode
-user_interface/package-lock.json
-user_interface/node_modules
-user_interface/wasmchess.js
-user_interface/wasmchess.wasm
+docs/package-lock.json
+docs/node_modules
