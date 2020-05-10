@@ -5,11 +5,11 @@
 
 class ChessPiece {
     public:
-        ChessPiece(std::string pieceType);
         ChessPiece(char pieceType, int playerNumber);
         ChessPiece();
         std::string toString();
         bool isNull();
+        bool enPassant();
         int getPlayer();
         char getType();
         bool hasMoved();
@@ -18,6 +18,7 @@ class ChessPiece {
         int player;
         char type;
         bool null;
+        bool enpassant;
         bool moved;
         bool pieceValid(char pieceType, int playerNumber);
 };

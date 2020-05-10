@@ -1,7 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import '../style/ChessBoard.css';
 
 function ChessPiece(props) {
+    const pieceCharacters = (type) => {
+        let character = '';
+        switch(type) {
+            case 'r':
+                character = '\u265C';
+                break;
+            case 'n':
+                character = '\u265E';
+                break;
+            case 'b':
+                character = '\u265D';
+                break;
+            case 'q':
+                character = '\u265B';
+                break;
+            case 'k':
+                character = '\u265A';
+                break;
+            case 'p':
+                character = '\u265F'; 
+                break;
+            default: 
+                character = ' ';
+        }
+        return character;
+    }
+
     const tileClass = () => {
         if(props.selected()) {
             return 'selected-tile';
@@ -23,10 +50,10 @@ function ChessPiece(props) {
     return (
         <div className="fill">
             <button 
-                className={`fill ${tileClass()}`} 
+                className={`fill chess-piece ${tileClass()} ${props.pieceColor}`} 
                 onClick={clickTile}
             >
-                {props.piece.type}
+                {pieceCharacters(props.piece.type)}
             </button>
         </div>
     );

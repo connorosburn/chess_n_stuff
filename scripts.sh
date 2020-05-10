@@ -26,7 +26,7 @@ function buildwasm() {
   main="lib/main.cpp"
   files=${files//$main/}
   echo $files
-  emcc -std=c++17 --bind $files -o user_interface/wasmchess.js
+  em++ -std=c++17 --bind $files -o user_interface/wasmchess.js
 }
 
 function collectcpp() {

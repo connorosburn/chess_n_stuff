@@ -148,6 +148,17 @@ TEST_CASE("It detects check") {
     REQUIRE(!chess.inCheck(0));
 }
 
+TEST_CASE("It wont let a player move into check") {
+    Chess chess;
+    REQUIRE(chess.move("a2","a3"));
+    REQUIRE(chess.move("d7","d5"));
+    REQUIRE(chess.move("a3","a4"));
+    REQUIRE(chess.move("e7","e6"));
+    REQUIRE(chess.move("a4","a5"));
+    REQUIRE(chess.move("f8","b4"));
+    REQUIRE(!chess.move("d2","d3"));
+}
+
 const std::vector<std::vector<ChessPiece>> checkMateBoard {
     {    
         {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
@@ -176,4 +187,25 @@ TEST_CASE("It detects checkmate") {
 
     REQUIRE(endState.condition == "checkmate");
     REQUIRE(endState.winner == 0);
+}
+
+TEST_CASE("It follows the en passant rule") {
+    Chess chess;
+    REQUIRE(chess.move("b2", "b3"));
+    REQUIRE(chess.move("b7", "b5"));
+    REQUIRE(chess.move("c2", "c3"));
+    REQUIRE(chess.move("b5", "b4"));
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(chess.move("b4", "a3"));
+    REQUIRE(chess.getPiece("a4").isNull());
+}
+
+TEST_CASE("En Passant oppurtunity gone after one turn") {
+    Chess chess;
+    REQUIRE(chess.move("b2", "b3"));
+    REQUIRE(chess.move("b7", "b5"));
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(chess.move("b5", "b4"));
+    REQUIRE(chess.move("c2", "c3"));
+    REQUIRE(!chess.move("b4", "a3"));
 }

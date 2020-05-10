@@ -53,7 +53,10 @@ class Chess {
         int turnCount;
         ChessPiece& piece(ChessPosition position);
         std::vector<std::vector<ChessPiece>> board;
+        void movePiece(ChessPosition start, ChessPosition end);
+        void enPassantExceptions(ChessPosition start, ChessPosition end);
         bool moveValid(ChessPosition start, ChessPosition end);
+        bool enPassant(ChessPosition start, ChessPosition end);
 
         // will show all regular movement available from each position
         std::vector<ChessPosition> everyOpenMoveFrom(ChessPosition start);
@@ -64,6 +67,7 @@ class Chess {
 
         // helper methods for pawn movement
         void pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positions);
+        void enPassantPositions(ChessPosition start, std::vector<ChessPosition>& positions);
 
         // searches for regular movement for each piece
         std::vector<ChessPosition> pawnMoves(ChessPosition start);

@@ -5,14 +5,16 @@
 
 const std::array<char, 6> pieceTypes {{'p', 'r', 'n', 'b', 'q', 'k'}};
 
-ChessPiece::ChessPiece(std::string pieceType): null(false) {
-
-}
-
-ChessPiece::ChessPiece(char pieceType, int playerNumber): null(false), moved(false) {
+ChessPiece::ChessPiece(char pieceType, int playerNumber): null(false), moved(false), enpassant(false) {
     pieceType = std::tolower(pieceType);
     if(pieceValid(pieceType, playerNumber)) {
         type = pieceType;
+        player = playerNumber;
+        enpassant = false;
+    } else if(pieceType == 'e') {
+        type = 'e';
+        enpassant = true;
+        null = true;
         player = playerNumber;
     } else {
         throw "Invalid chess piece";
@@ -29,7 +31,7 @@ bool ChessPiece::pieceValid(char pieceType, int playerNumber) {
     return valid;
 }
 
-ChessPiece::ChessPiece(): null(true) {
+ChessPiece::ChessPiece(): null(true), enpassant(false), type('e') {
 
 }
 
@@ -44,6 +46,10 @@ std::string ChessPiece::toString() {
 
 bool ChessPiece::isNull() {
     return null;
+}
+
+bool ChessPiece::enPassant() {
+    return enpassant;
 }
 
 int ChessPiece::getPlayer() {

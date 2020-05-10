@@ -37,6 +37,48 @@ std::vector<std::vector<ChessPiece>> Chess::getBoard() {
     return board;
 }
 
+int pawnDirection(int player) {
+    if(player == 0) {
+        return -1;
+    } else if(player == 1) {
+        return 1;
+    } else {
+        throw "Invalid player";
+    }
+}
+
+void Chess::movePiece(ChessPosition start, ChessPosition end) {
+    enPassantExceptions(start, end);
+    piece(end) = piece(start);
+    piece(start) = ChessPiece();
+    piece(end).move();
+    turnCount++;
+}
+
+void Chess::enPassantExceptions(ChessPosition start, ChessPosition end) {
+    int yDirection = pawnDirection(piece(start).getPlayer());
+    if(enPassant(start, end)) {
+        piece({end.x, end.y - yDirection}) = ChessPiece();
+    }
+
+
+
+    for(int i = 0; i < boardSize; i++) {
+        std::vector<ChessPosition> enPassantTargets {
+            { ChessPosition(i, 2), ChessPosition(i, 5) }
+        };
+        for(auto target : enPassantTargets) {
+            if(piece(target).enPassant()) {
+                piece(target) = ChessPiece();
+            }
+        }
+    }
+    
+    if(piece(start).getType() == 'p' && std::abs(start.y - end.y) == 2) {
+        piece({start.x, start.y + yDirection}) = ChessPiece('e', piece(start).getPlayer());
+    }
+}
+
 bool Chess::move(std::string start, std::string end) {
     return move(ChessPosition(start), ChessPosition(end));
 }
@@ -44,10 +86,7 @@ bool Chess::move(std::string start, std::string end) {
 bool Chess::move(ChessPosition start, ChessPosition end) {
     bool valid { moveValid(start, end) };
     if(valid) {
-        piece(end) = piece(start);
-        piece(start) = ChessPiece();
-        piece(end).move();
-        turnCount++;
+        movePiece(start, end);
     }
     return valid;
 }
@@ -99,22 +138,33 @@ std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
     return positions;
 }
 
-int pawnDirection(int player) {
-    if(player == 0) {
-        return -1;
-    } else if(player == 1) {
-        return 1;
-    } else {
-        throw "Invalid player";
-    }
-}
-
 void Chess::pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positions) {
     int yDirection { pawnDirection(piece(start).getPlayer()) };
     const std::vector<ChessPosition> captureChecks = {ChessPosition(1, yDirection), ChessPosition(-1, yDirection)};
     for(ChessPosition offset : captureChecks) {
         ChessPosition position{start + offset};
         if(position.onBoard() && !piece(position).isNull() && piece(position).getPlayer() != piece(start).getPlayer()) {
+            positions.push_back(position);
+        }
+    }
+}
+
+bool Chess::enPassant(ChessPosition start, ChessPosition end) {
+    int yDirection = pawnDirection(piece(start).getPlayer());
+    bool valid = piece(start).getType() == 'p';
+    valid = valid && piece(end).enPassant() && piece(end).getPlayer() != piece(start).getPlayer();
+    valid = valid && start.y + yDirection == end.y && std::abs(start.x - end.x) == 1;
+    valid = valid &&  end.onBoard();
+    return valid;
+}
+
+void Chess::enPassantPositions(ChessPosition start, std::vector<ChessPosition>& positions) {
+    int yDirection { pawnDirection(piece(start).getPlayer()) };
+    std::vector<ChessPosition> potentialPositions {
+        { start + ChessPosition(-1, yDirection), start + ChessPosition(1, yDirection) }
+    };
+    for(auto& position : potentialPositions) {
+        if(enPassant(start, position)) {
             positions.push_back(position);
         }
     }
@@ -146,6 +196,8 @@ std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
     }
 
     pawnCaptures(start, positions);
+
+    enPassantPositions(start, positions);
 
     return positions;
 }

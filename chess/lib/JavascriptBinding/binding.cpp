@@ -25,6 +25,14 @@ std::vector<ExposedPiece> getBoard() {
     return pieces;
 }
 
+bool move(ChessPosition start, ChessPosition end) {
+    return chess.move(start, end);
+}
+
+EndState endState() {
+    return chess.endState();
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::class_<ChessPosition>("Position")
         .constructor<int, int>()
@@ -41,5 +49,12 @@ EMSCRIPTEN_BINDINGS(my_module) {
         ;
     emscripten::register_vector<ExposedPiece>("PieceVector");
 
+    emscripten::value_object<EndState>("EndState")
+        .field("winner", &EndState::winner)
+        .field("condition", &EndState::condition)
+        ;
+
     emscripten::function("getBoard", &getBoard);
+    emscripten::function("move", &move);
+    emscripten::function("endState", &endState);
 }
