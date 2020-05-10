@@ -1,6 +1,14 @@
 .chess-board {
-    width: 500px;
-    height: 500px;
+    width: 750px;
+    height: 750px;
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
     display: flex;
     flex-direction: column;
     align-items: space-evenly;
