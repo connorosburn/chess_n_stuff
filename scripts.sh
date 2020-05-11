@@ -19,6 +19,10 @@ function buildwasm() {
   do
     files="$files $(collectcpp $d)"
   done
+  for d in `find chess/lib/AI -type d`
+  do
+    files="$files $(collectcpp $d)"
+  done
   for d in `find chess/lib/JavascriptBinding -type d`
   do
     files="$files $(collectcpp $d)"
@@ -26,7 +30,7 @@ function buildwasm() {
   main="lib/main.cpp"
   files=${files//$main/}
   echo $files
-  em++ -std=c++17 --bind $files -o docs/wasmchess.js
+  em++ -std=c++17 -s ALLOW_MEMORY_GROWTH=1 --bind $files -o docs/wasmchess.js
 }
 
 function collectcpp() {

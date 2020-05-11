@@ -1,6 +1,7 @@
 #include <emscripten/bind.h>
 #include "../GameEngine/Chess.hpp"
-
+#include "../AI/AI.hpp"
+#include <memory>
 
 Chess chess;
 
@@ -41,6 +42,19 @@ EndState endState() {
     return chess.endState();
 }
 
+void aiMove() {
+    ChessMove moveChoice { AI(chess) };
+    if(chess.isPawnPromotion(moveChoice.start, moveChoice.end)) {
+        chess.move(moveChoice.start, moveChoice.end, moveChoice.promotion);
+    } else {
+        chess.move(moveChoice.start, moveChoice.end);
+    }
+}
+
+int playerTurn() {
+    return chess.playerTurn();
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::class_<ChessPosition>("Position")
         .constructor<int, int>()
@@ -67,4 +81,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("promotePawn", &promotePawn);
     emscripten::function("endState", &endState);
     emscripten::function("isPawnPromotion", &isPawnPromotion);
+    emscripten::function("aiMove", &aiMove);
+    emscripten::function("playerTurn", &playerTurn);
 }

@@ -3,8 +3,11 @@ const boardSize = 8;
 class Chess {
     #board;
     #Module;
-    constructor(module) {
+    #player;
+    constructor(module, player) {
         this.#Module = module;
+        this.#player = player;
+        this.#updateAI();
         this.#updateBoard();
     }
 
@@ -16,7 +19,7 @@ class Chess {
         start = new this.#Module.Position(start.x, start.y);
         end = new this.#Module.Position(end.x, end.y);
         let success = false;
-        
+
         if(this.isPawnPromotion(start, end)) {
             success = this.#Module.promotePawn(start, end, pieceType);
         } else {
@@ -54,8 +57,15 @@ class Chess {
         end = new this.#Module.Position(end.x, end.y);
         return this.#Module.isPawnPromotion(start, end);
     }
+    
+    #updateAI() {
+        if((this.#player == 1 || this.#player == 0) && this.#Module.playerTurn() != this.#player) {
+            this.#Module.aiMove();
+        }
+    }
 
     #updateBoard() {
+        this.#updateAI();
         this.#board = [];
         const rawBoard = this.#Module.getBoard();
         for(let i = 0; i < rawBoard.size(); i++) {
