@@ -67,3 +67,10 @@
 .end-text {
     font-size 50pt;
 }
+
+.promotion-tile {
+    color: #7f7f7f;
+    width: 150px;
+    height: 150px;
+    font-size: 300%;
+}

@@ -45,7 +45,10 @@ class Chess {
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
         bool move(std::string start, std::string end);
+        bool move(std::string start, std::string end, char pieceType);
         bool move(ChessPosition start, ChessPosition end);
+        bool move(ChessPosition start, ChessPosition end, char pieceType);
+        bool isPawnPromotion(ChessPosition start, ChessPosition end);
         EndState endState();
         std::vector<ChessPosition> moveablePieces();
 

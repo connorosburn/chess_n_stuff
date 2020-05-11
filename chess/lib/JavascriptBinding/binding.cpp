@@ -29,6 +29,14 @@ bool move(ChessPosition start, ChessPosition end) {
     return chess.move(start, end);
 }
 
+bool promotePawn(ChessPosition start, ChessPosition end, std::string pieceType) {
+    return chess.move(start, end, pieceType[0]);
+}
+
+bool isPawnPromotion(ChessPosition start, ChessPosition end) {
+    return chess.isPawnPromotion(start, end);
+}
+
 EndState endState() {
     return chess.endState();
 }
@@ -56,5 +64,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     emscripten::function("getBoard", &getBoard);
     emscripten::function("move", &move);
+    emscripten::function("promotePawn", &promotePawn);
     emscripten::function("endState", &endState);
+    emscripten::function("isPawnPromotion", &isPawnPromotion);
 }

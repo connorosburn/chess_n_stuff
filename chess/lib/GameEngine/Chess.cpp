@@ -83,10 +83,32 @@ bool Chess::move(std::string start, std::string end) {
     return move(ChessPosition(start), ChessPosition(end));
 }
 
+bool Chess::move(std::string start, std::string end, char pieceType) {
+    return move(ChessPosition(start), ChessPosition(end), pieceType);
+}
+
+bool Chess::isPawnPromotion(ChessPosition start, ChessPosition end) {
+    return !piece(start).isNull() && piece(start).getType() == 'p' && (end.y == 0 || end.y == boardSize - 1);
+}
+
 bool Chess::move(ChessPosition start, ChessPosition end) {
-    bool valid { moveValid(start, end) };
+    bool valid { moveValid(start, end) && !isPawnPromotion(start, end) };
     if(valid) {
         movePiece(start, end);
+    }
+    return valid;
+}
+
+bool Chess::move(ChessPosition start, ChessPosition end, char pieceType) {
+    bool valid { moveValid(start, end) && isPawnPromotion(start, end) };
+    const std::vector<char> promotable {{'r','b','n','q'}};
+    valid = valid && std::any_of(promotable.begin(), promotable.end(), 
+        [pieceType](char t) {
+            return t == pieceType;
+        });
+    if(valid) {
+        movePiece(start, end);
+        piece(end) = ChessPiece(pieceType, otherPlayer());
     }
     return valid;
 }

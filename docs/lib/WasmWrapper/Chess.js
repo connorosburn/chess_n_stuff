@@ -12,15 +12,23 @@ class Chess {
         return this.#board;
     }
 
-    move(start, end) {
+    move(start, end, pieceType) {
         start = new this.#Module.Position(start.x, start.y);
         end = new this.#Module.Position(end.x, end.y);
-        const success = this.#Module.move(start, end);
+        let success = false;
+        
+        if(this.isPawnPromotion(start, end)) {
+            success = this.#Module.promotePawn(start, end, pieceType);
+        } else {
+            success = this.#Module.move(start, end);
+        }
+
         if(success) {
             this.#updateBoard();
         } else {
             throw "Invalid move";
         }
+
         return this.getBoard();
     }
 
@@ -39,6 +47,12 @@ class Chess {
                 winner: endState.winner
             };
         }
+    }
+
+    isPawnPromotion(start, end) {
+        start = new this.#Module.Position(start.x, start.y);
+        end = new this.#Module.Position(end.x, end.y);
+        return this.#Module.isPawnPromotion(start, end);
     }
 
     #updateBoard() {

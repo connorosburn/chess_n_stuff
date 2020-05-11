@@ -41,8 +41,10 @@ function ChessPiece(props) {
     }
 
     const clickTile = () => {
-        if(props.selected || props.selectable()) {
-            props.selectTile(props.position.x, props.position.y, props.piece);
+        if(props.selectable()) {
+            props.selectTile();
+        } else if(props.selected()) {
+            props.deselectTile();
         }
     }
 

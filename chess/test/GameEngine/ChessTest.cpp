@@ -209,3 +209,19 @@ TEST_CASE("En Passant oppurtunity gone after one turn") {
     REQUIRE(chess.move("c2", "c3"));
     REQUIRE(!chess.move("b4", "a3"));
 }
+
+TEST_CASE("It allows pawn promotion") {
+    Chess chess;
+    REQUIRE(chess.move("a2", "a4"));
+    REQUIRE(chess.move("d7", "d5"));
+    REQUIRE(chess.move("a4", "a5"));
+    REQUIRE(chess.move("d5", "d4"));
+    REQUIRE(chess.move("a5", "a6"));
+    REQUIRE(chess.move("d4", "d3"));
+    REQUIRE(chess.move("a6", "b7"));
+    REQUIRE(chess.move("f7", "f6"));
+    REQUIRE(!chess.move("b7", "a8"));
+    REQUIRE(chess.move("b7", "a8", 'q'));
+    REQUIRE(chess.getPiece("a8").getType() =='q');
+    REQUIRE(chess.getPiece("a8").getPlayer() == 0);
+}
