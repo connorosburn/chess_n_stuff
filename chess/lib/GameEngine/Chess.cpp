@@ -335,25 +335,25 @@ bool Chess::isCastleAttempt(ChessPosition start, ChessPosition end) {
     bool valid = start.onBoard() && end.onBoard();
     valid = valid && piece(start).getType() == 'k' && !piece(start).hasMoved();
     valid = valid && std::abs(start.x - end.x) == 2;
+    if(valid) {
+        ChessPosition rookPosition(0, 0);
+        ChessPosition kingDirection(0, 0);
+        if(end.x > start.x) {
+            rookPosition = ChessPosition(boardSize - 1, start.y);
+            kingDirection = ChessPosition(1, 0);
+        } else if(end.x < start.x) {
+            rookPosition = ChessPosition(0, start.y);
+            kingDirection = ChessPosition(-1, 0);
+        }
 
-    ChessPosition rookPosition(0, 0);
-    ChessPosition kingDirection(0, 0);
-
-    if(valid && end.x > start.x) {
-        rookPosition = ChessPosition(boardSize - 1, start.y);
-        kingDirection = ChessPosition(1, 0);
-    } else if(valid && end.x < start.x) {
-        rookPosition = ChessPosition(0, start.y);
-        kingDirection = ChessPosition(-1, 0);
-    }
-
-    ChessPosition rookDirection = kingDirection * -1;
-    valid = valid && !piece(rookPosition).isNull() && piece(rookPosition).getType() == 'r' && !piece(rookPosition).hasMoved();
-    for(ChessPosition pos = start + kingDirection; pos != end && valid; pos += kingDirection) {
-        valid = valid && piece(pos).isNull();
-    }
-    for(ChessPosition pos = rookPosition + rookDirection; pos != end + rookDirection && valid; pos += rookDirection) {
-        valid = valid && piece(pos).isNull();
+        ChessPosition rookDirection = kingDirection * -1;
+        valid = valid && !piece(rookPosition).isNull() && piece(rookPosition).getType() == 'r' && !piece(rookPosition).hasMoved();
+        for(ChessPosition pos = start + kingDirection; pos != end && valid; pos += kingDirection) {
+            valid = valid && piece(pos).isNull();
+        }
+        for(ChessPosition pos = rookPosition + rookDirection; pos != end + rookDirection && valid; pos += rookDirection) {
+            valid = valid && piece(pos).isNull();
+        }
     }
     return valid;
 }
