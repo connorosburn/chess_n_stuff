@@ -42,6 +42,7 @@ class Chess {
         bool inCheck(int player);
         std::vector<std::vector<ChessPiece>> getBoard();
         std::vector<ChessPosition> everyLegalMoveFrom(ChessPosition start);
+        std::vector<Chess> everyHypotheticalGame();
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
         bool move(std::string start, std::string end);
@@ -52,6 +53,8 @@ class Chess {
         EndState endState();
 
     private:
+        Chess(ChessPosition start, ChessPosition end, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber);
+        Chess(ChessPosition start, ChessPosition end, char type, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber);
         int turnCount;
         ChessPiece& piece(ChessPosition position);
         std::vector<std::vector<ChessPiece>> board;

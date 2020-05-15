@@ -5,22 +5,10 @@ Node::Node(Chess chessGame): chess(chessGame) {
 
 }
 
-std::map<ChessMove, std::shared_ptr<Node>> Node::getChildren() {
+std::vector<std::shared_ptr<Node>> Node::getChildren() {
     if(children.empty()) {
-        for(ChessMove move : legalMoves()) {
-            if(chess.isPawnPromotion(move.start, move.end)) {
-                const std::vector<char> options = {'r', 'n', 'b', 'q'};
-                for(char option : options) {
-                    Chess chessCopy = chess;
-                    chessCopy.move(move.start, move.end, option);
-                    ChessMove promotionMove(move.start, move.end, option);
-                    children.emplace(promotionMove, new Node(chessCopy));      
-                }
-            } else {
-                Chess chessCopy = chess;
-                chessCopy.move(move.start, move.end);
-                children.emplace(move, new Node(chessCopy));
-            }
+        for(Chess& game : chess.everyHypotheticalGame()) {
+            children.emplace_back(new Node(game));
         }
     }
     return children;
@@ -66,7 +54,7 @@ double Node::maximize(double max, double min, int searchDepth) {
     if(searchDepth == 0) {
         max = localScore(chess.playerTurn());
     } else {
-        for(auto[move, child] : getChildren()) {
+        for(auto child : getChildren()) {
             double score = child->minimize(max, min, searchDepth - 1);
             if(score >= min) {
                 return min;
@@ -82,7 +70,7 @@ double Node::minimize(double max, double min, int searchDepth) {
     if(searchDepth == 0) {
         min = localScore(chess.otherPlayer());
     } else {
-        for(auto[move, child] : getChildren()) {
+        for(auto child : getChildren()) {
             double score = child->maximize(max, min, searchDepth - 1);
             if(score <= max) {
                 return max;
@@ -92,17 +80,4 @@ double Node::minimize(double max, double min, int searchDepth) {
         }
     }
     return min;
-}
-
-std::vector<ChessMove> Node::legalMoves() {
-    std::vector<ChessMove> moves;
-    for(int x = 0; x < boardSize; x++) {
-        for(int y = 0; y < boardSize; y++) {
-            ChessPosition start(x, y);
-            for(auto end : chess.everyLegalMoveFrom(start)) {
-                moves.emplace_back(start, end);
-            }
-        }
-    }
-    return moves;
 }

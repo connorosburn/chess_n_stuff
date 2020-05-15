@@ -3,6 +3,6 @@
 
 #include "Node.hpp"
 
-ChessMove AI(Chess chess, int searchDepth = 2);
+Chess AI(Chess chess, int searchDepth = 2);
 
 #endif
