@@ -43,12 +43,7 @@ EndState endState() {
 }
 
 void aiMove() {
-    ChessMove moveChoice { AI(chess) };
-    if(chess.isPawnPromotion(moveChoice.start, moveChoice.end)) {
-        chess.move(moveChoice.start, moveChoice.end, moveChoice.promotion);
-    } else {
-        chess.move(moveChoice.start, moveChoice.end);
-    }
+    chess = AI(chess);
 }
 
 int playerTurn() {

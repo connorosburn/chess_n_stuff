@@ -9,6 +9,17 @@ Chess::Chess(): Chess(defaultBoard, 0) {
 
 }
 
+Chess::Chess(ChessPosition start, ChessPosition end, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber): 
+Chess(oldBoard, turnNumber) {
+    movePiece(start, end);
+}
+
+Chess::Chess(ChessPosition start, ChessPosition end, char type, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber): 
+Chess(oldBoard, turnNumber) {
+    movePiece(start, end);
+    piece(end) = ChessPiece(type, piece(end).getPlayer());
+}
+
 int Chess::getTurnCount() {
     return turnCount;
 }
@@ -122,6 +133,26 @@ std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
         }), moves.end());
     }
     return moves;
+}
+
+std::vector<Chess> Chess::everyHypotheticalGame() {
+    std::vector<Chess> games;
+    for(int x = 0; x < boardSize; x++) {
+        for(int y = 0; y < boardSize; y++) {
+            ChessPosition start(x, y);
+            for(auto end : everyLegalMoveFrom(start)) {
+                if(isPawnPromotion(start, end)) {
+                    const std::vector<char> promoteable = {'r','b','n','q'};
+                    for(char type : promoteable) {
+                        games.push_back({start, end, type, board, turnCount});
+                    }
+                } else {
+                    games.push_back({start, end, board, turnCount});
+                }
+            }
+        }
+    }
+    return games;
 }
 
 bool Chess::moveValid(ChessPosition start, ChessPosition end) {
