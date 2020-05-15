@@ -60,6 +60,15 @@ int pawnDirection(int player) {
 
 void Chess::movePiece(ChessPosition start, ChessPosition end) {
     enPassantExceptions(start, end);
+    if(isCastleAttempt(start, end)) {
+        if(end.x > start.x) {
+            piece(end + ChessPosition(-1, 0)) = piece({boardSize - 1, start.y});
+            piece({boardSize - 1, start.y}) = ChessPiece();
+        } else if(end.x < start.x) {
+            piece(end + ChessPosition(1, 0)) = piece({0, start.y});
+            piece({0, start.y}) = ChessPiece();
+        }
+    }
     piece(end) = piece(start);
     piece(start) = ChessPiece();
     piece(end).move();
@@ -71,8 +80,6 @@ void Chess::enPassantExceptions(ChessPosition start, ChessPosition end) {
     if(enPassant(start, end)) {
         piece({end.x, end.y - yDirection}) = ChessPiece();
     }
-
-
 
     for(int i = 0; i < boardSize; i++) {
         std::vector<ChessPosition> enPassantTargets {
@@ -89,6 +96,7 @@ void Chess::enPassantExceptions(ChessPosition start, ChessPosition end) {
         piece({start.x, start.y + yDirection}) = ChessPiece('e', piece(start).getPlayer());
     }
 }
+
 
 bool Chess::move(std::string start, std::string end) {
     return move(ChessPosition(start), ChessPosition(end));
@@ -129,10 +137,19 @@ std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
     if(!piece(start).isNull() && playerTurn() == piece(start).getPlayer()) {
         moves = everyOpenMoveFrom(start);
         moves.erase(std::remove_if(moves.begin(), moves.end(), [this, start](ChessPosition end) {
-            return this->hypotheticalCheck(start, end);
+            return this->hypotheticalCheck(start, end) || this->castleThreatened(start, end);
         }), moves.end());
     }
     return moves;
+}
+
+bool Chess::castleThreatened(ChessPosition start, ChessPosition end) {
+    bool threatened { false };
+    if(isCastleAttempt(start, end)) {
+        ChessPosition middle((end.x - start.x) / 2, start.y);
+        threatened = hypotheticalCheck(start, middle);
+    }
+    return threatened;
 }
 
 std::vector<Chess> Chess::everyHypotheticalGame() {
@@ -203,7 +220,7 @@ bool Chess::enPassant(ChessPosition start, ChessPosition end) {
     bool valid = piece(start).getType() == 'p';
     valid = valid && piece(end).enPassant() && piece(end).getPlayer() != piece(start).getPlayer();
     valid = valid && start.y + yDirection == end.y && std::abs(start.x - end.x) == 1;
-    valid = valid &&  end.onBoard();
+    valid = valid && end.onBoard();
     return valid;
 }
 
@@ -314,6 +331,33 @@ std::vector<ChessPosition> Chess::knightMoves(ChessPosition start) {
     return checkIndividualOffsets(start, offsets);
 }
 
+bool Chess::isCastleAttempt(ChessPosition start, ChessPosition end) {
+    bool valid = start.onBoard() && end.onBoard();
+    valid = valid && piece(start).getType() == 'k' && !piece(start).hasMoved();
+    valid = valid && std::abs(start.x - end.x) == 2;
+
+    ChessPosition rookPosition(0, 0);
+    ChessPosition kingDirection(0, 0);
+
+    if(valid && end.x > start.x) {
+        rookPosition = ChessPosition(boardSize - 1, start.y);
+        kingDirection = ChessPosition(1, 0);
+    } else if(valid && end.x < start.x) {
+        rookPosition = ChessPosition(0, start.y);
+        kingDirection = ChessPosition(-1, 0);
+    }
+
+    ChessPosition rookDirection = kingDirection * -1;
+    valid = valid && !piece(rookPosition).isNull() && piece(rookPosition).getType() == 'r' && !piece(rookPosition).hasMoved();
+    for(ChessPosition pos = start + kingDirection; pos != end && valid; pos += kingDirection) {
+        valid = valid && piece(pos).isNull();
+    }
+    for(ChessPosition pos = rookPosition + rookDirection; pos != end + rookDirection && valid; pos += rookDirection) {
+        valid = valid && piece(pos).isNull();
+    }
+    return valid;
+}
+
 std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
     std::vector<ChessPosition> offsets {
         {
@@ -321,7 +365,18 @@ std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
             ChessPosition(1, 1), ChessPosition(-1, 1), ChessPosition(1, -1), ChessPosition(-1, -1)
         }
     };
-    return checkIndividualOffsets(start, offsets);
+    std::vector<ChessPosition> moves { checkIndividualOffsets(start, offsets) };
+
+    if(!piece(start).hasMoved()) {
+        std::vector<ChessPosition> castleOffsets {{ChessPosition(-2, 0), ChessPosition(2, 0)}};
+        for(ChessPosition offset : castleOffsets) {
+            ChessPosition end = start + offset;
+            if(isCastleAttempt(start, end)) {
+                moves.push_back(end);
+            }
+        }
+    }
+    return moves;
 }
 
 bool Chess::inCheck(int player) {

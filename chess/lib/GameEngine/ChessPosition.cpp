@@ -45,6 +45,10 @@ bool ChessPosition::operator==(ChessPosition position) const {
     return x == position.x && y == position.y;
 }
 
+bool ChessPosition::operator!=(ChessPosition position) const {
+    return !(*this == position);
+}
+
 ChessPosition ChessPosition::operator+(ChessPosition position) const {
     return ChessPosition(x + position.x, y + position.y);
 }

@@ -61,7 +61,6 @@ class Chess {
         void movePiece(ChessPosition start, ChessPosition end);
         void enPassantExceptions(ChessPosition start, ChessPosition end);
         bool moveValid(ChessPosition start, ChessPosition end);
-        bool enPassant(ChessPosition start, ChessPosition end);
         bool playerStuck();
 
         // will show all regular movement available from each position
@@ -71,9 +70,13 @@ class Chess {
         std::vector<ChessPosition> searchAlongVectors(ChessPosition start, std::vector<ChessPosition> searchVectors);
         std::vector<ChessPosition> checkIndividualOffsets(ChessPosition start, std::vector<ChessPosition> offsets);
 
-        // helper methods for pawn movement
+        // helper methods for particular piece movement
         void pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positions);
         void enPassantPositions(ChessPosition start, std::vector<ChessPosition>& positions);
+        bool enPassant(ChessPosition start, ChessPosition end);
+        bool isCastleAttempt(ChessPosition start, ChessPosition end);
+        bool castleThreatened(ChessPosition start, ChessPosition end);
+
 
         // searches for regular movement for each piece
         std::vector<ChessPosition> pawnMoves(ChessPosition start);

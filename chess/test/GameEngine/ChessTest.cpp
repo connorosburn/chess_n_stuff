@@ -225,3 +225,22 @@ TEST_CASE("It allows pawn promotion") {
     REQUIRE(chess.getPiece("a8").getType() =='q');
     REQUIRE(chess.getPiece("a8").getPlayer() == 0);
 }
+
+TEST_CASE("It follows castling rules") {
+    Chess chess;
+    REQUIRE(chess.move("e2", "e3"));
+    REQUIRE(chess.move("d7", "d5"));
+    REQUIRE(chess.move("f1", "e2"));
+    REQUIRE(chess.move("d8", "d6"));
+    REQUIRE(chess.move("g1", "h3"));
+    REQUIRE(chess.move("c8", "d7")); 
+    REQUIRE(chess.move("e1", "g1")); 
+    REQUIRE(chess.move("b8", "a6")); 
+    REQUIRE(chess.move("a2", "a3"));
+    REQUIRE(chess.move("e8", "c8")); 
+
+    REQUIRE(chess.getPiece("g1").toString() == "k0");
+    REQUIRE(chess.getPiece("f1").toString() == "r0");
+    REQUIRE(chess.getPiece("c8").toString() == "k1");
+    REQUIRE(chess.getPiece("d8").toString() == "r1");
+}
