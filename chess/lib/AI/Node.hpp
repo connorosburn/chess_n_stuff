@@ -28,12 +28,13 @@ class Node {
     public:
         Node(Chess chessGame);
         std::map<ChessMove, std::shared_ptr<Node>> getChildren();
-        std::vector<ChessMove> legalMoves();
         double localScore(int player);
-        double depthScore(int player);
+        double minimize(double max, double min, int searchDepth);
+        double maximize(double max, double min, int searchDepth);
 
     private:
         double scorePieces(int player);
+        std::vector<ChessMove> legalMoves();
         std::map<ChessMove, std::shared_ptr<Node>> children;
         Chess chess;
 };

@@ -114,25 +114,21 @@ bool Chess::move(ChessPosition start, ChessPosition end, char pieceType) {
 }
 
 std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
-    std::vector<ChessPosition> moves { everyOpenMoveFrom(start) };
-    moves.erase(std::remove_if(moves.begin(), moves.end(), [start, this](ChessPosition p) {
-        return !this->moveValid(start, p);
-    }), moves.end());
+    std::vector<ChessPosition> moves;
+    if(!piece(start).isNull() && playerTurn() == piece(start).getPlayer()) {
+        moves = everyOpenMoveFrom(start);
+        moves.erase(std::remove_if(moves.begin(), moves.end(), [this, start](ChessPosition end) {
+            return this->hypotheticalCheck(start, end);
+        }), moves.end());
+    }
     return moves;
 }
 
 bool Chess::moveValid(ChessPosition start, ChessPosition end) {
-    bool valid = piece(start).getPlayer() == playerTurn();
-    if(valid) {
-        std::vector<ChessPosition> moves = everyOpenMoveFrom(start);
-        valid = std::any_of(moves.begin(), moves.end(),
-            [end](ChessPosition position) {
-                return position == end;
-            }
-        );
-    }
-    valid = valid && !hypotheticalCheck(start, end);
-    return valid;
+    auto potentialMoves = everyLegalMoveFrom(start);
+    return std::any_of(potentialMoves.begin(), potentialMoves.end(), [end](ChessPosition position) {
+        return position == end;
+    });
 }
 
 std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
@@ -299,22 +295,16 @@ std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
 
 bool Chess::inCheck(int player) {
     bool check { false };
-    for(int i = 0 ; i < board.size() && !check; i++) {
-        for(int j = 0; j < board[i].size() && !check; j++) {
-            check = check || detectCheckFromPosition(j, i, player);
+    for(int y = 0 ; y < boardSize && !check; y++) {
+        for(int x = 0; x < boardSize && !check; x++) {
+            if(!piece({x, y}).isNull() && piece({x, y}).getPlayer() != player) {
+                std::vector<ChessPosition> threatened = everyOpenMoveFrom({x, y});
+                check = check || std::any_of(threatened.begin(), threatened.end(), [this, player](ChessPosition position) {
+                    return this->piece(position).getPlayer() == player && 
+                            this->piece(position).getType() == 'k';
+                });
+            }
         }
-    }
-    return check;
-}
-
-bool Chess::detectCheckFromPosition(int x, int y, int player) {
-    bool check { false };
-    const bool enemyPiece { !board[y][x].isNull() && board[y][x].getPlayer() != player };
-    if(enemyPiece) {
-        std::vector<ChessPosition> moves { everyOpenMoveFrom({x, y}) };
-        check = std::any_of(moves.begin(), moves.end(), [player, this](ChessPosition m) {
-            return this->piece(m).getType() == 'k' && this->piece(m).getPlayer() == player;
-        });
     }
     return check;
 }
@@ -329,11 +319,21 @@ bool Chess::hypotheticalCheck(ChessPosition start, ChessPosition end) {
     return check;
 }
 
+bool Chess::playerStuck() {
+    bool stuck { true };
+    for(int y = 0; y < boardSize && stuck; y++) {
+        for(int x = 0; x < boardSize && stuck; x++) {
+            stuck = stuck && everyLegalMoveFrom({x, y}).empty();
+        }
+    }
+    return stuck;
+}
+
 
 EndState Chess::endState() {
-    const bool stuck = moveablePieces().empty();
-    const bool check = inCheck(playerTurn());
     EndState state;
+    const bool stuck = playerStuck();
+    const bool check = inCheck(playerTurn());
     if(stuck && check) {
         state = EndState("checkmate", otherPlayer());
     } else if(stuck && !check) {
@@ -342,18 +342,3 @@ EndState Chess::endState() {
     return state;
 }
 
-std::vector<ChessPosition> Chess::moveablePieces() {
-    std::vector<ChessPosition> positions;
-    for(int y = 0; y < board.size(); y++) {
-        for(int x = 0; x < board[y].size(); x++) {
-            std::vector<ChessPosition> openings { everyOpenMoveFrom({x, y}) };
-            const bool anyLegal = std::any_of(openings.begin(), openings.end(), [this, x, y](ChessPosition p) {
-                return this->moveValid({x, y}, p);
-            });
-            if(anyLegal) {
-                positions.emplace_back(x, y);
-            }
-        }
-    }
-    return positions;
-}
