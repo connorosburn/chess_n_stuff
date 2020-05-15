@@ -1,4 +1,5 @@
 #include "Node.hpp"
+#include <future>
 
 Node::Node(Chess chessGame): chess(chessGame) {
 
@@ -23,16 +24,6 @@ std::map<ChessMove, std::shared_ptr<Node>> Node::getChildren() {
         }
     }
     return children;
-}
-
-std::vector<ChessMove> Node::legalMoves() {
-    std::vector<ChessMove> moves;
-    for(ChessPosition& start : chess.moveablePieces()) {
-        for(ChessPosition& end : chess.everyLegalMoveFrom(start)) {
-            moves.emplace_back(start, end);
-        }
-    }
-    return moves;
 }
 
 double Node::scorePieces(int player) {
@@ -71,11 +62,47 @@ double Node::localScore(int player) {
     return score;
 }
 
-double Node::depthScore(int player) {
-    double total {0};
-    for(auto& [move, child] : children) {
-        total += child->depthScore(player);
+double Node::maximize(double max, double min, int searchDepth) {
+    if(searchDepth == 0) {
+        max = localScore(chess.playerTurn());
+    } else {
+        for(auto[move, child] : getChildren()) {
+            double score = child->minimize(max, min, searchDepth - 1);
+            if(score >= min) {
+                return min;
+            } else if(score > max) {
+                max = score;
+            }
+        }
     }
-    total += localScore(player);
-    return total / static_cast<double>(children.size() + 1);
+    return max;
+}
+
+double Node::minimize(double max, double min, int searchDepth) {
+    if(searchDepth == 0) {
+        min = localScore(chess.otherPlayer());
+    } else {
+        for(auto[move, child] : getChildren()) {
+            double score = child->maximize(max, min, searchDepth - 1);
+            if(score <= max) {
+                return max;
+            } else if(score < min) {
+                min = score;
+            }
+        }
+    }
+    return min;
+}
+
+std::vector<ChessMove> Node::legalMoves() {
+    std::vector<ChessMove> moves;
+    for(int x = 0; x < boardSize; x++) {
+        for(int y = 0; y < boardSize; y++) {
+            ChessPosition start(x, y);
+            for(auto end : chess.everyLegalMoveFrom(start)) {
+                moves.emplace_back(start, end);
+            }
+        }
+    }
+    return moves;
 }

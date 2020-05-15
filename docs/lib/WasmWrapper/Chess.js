@@ -7,7 +7,6 @@ class Chess {
     constructor(module, player) {
         this.#Module = module;
         this.#player = player;
-        this.#updateAI();
         this.#updateBoard();
     }
 
@@ -31,8 +30,6 @@ class Chess {
         } else {
             throw "Invalid move";
         }
-
-        return this.getBoard();
     }
 
     endState() {
@@ -58,14 +55,20 @@ class Chess {
         return this.#Module.isPawnPromotion(start, end);
     }
     
-    #updateAI() {
-        if((this.#player == 1 || this.#player == 0) && this.#Module.playerTurn() != this.#player) {
+    updateAI() {
+        let aiTurn = (this.#player == 1 || this.#player == 0) && this.#Module.playerTurn() != this.#player;
+        if(aiTurn) {
             this.#Module.aiMove();
+            this.#updateBoard();
         }
+        return aiTurn;
+    }
+
+    isAI(piece) {
+        return (this.#player == 1 || this.#player == 0) && piece.player != this.#player && !piece.null;
     }
 
     #updateBoard() {
-        this.#updateAI();
         this.#board = [];
         const rawBoard = this.#Module.getBoard();
         for(let i = 0; i < rawBoard.size(); i++) {

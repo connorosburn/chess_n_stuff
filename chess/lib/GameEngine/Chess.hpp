@@ -50,7 +50,6 @@ class Chess {
         bool move(ChessPosition start, ChessPosition end, char pieceType);
         bool isPawnPromotion(ChessPosition start, ChessPosition end);
         EndState endState();
-        std::vector<ChessPosition> moveablePieces();
 
     private:
         int turnCount;
@@ -60,6 +59,7 @@ class Chess {
         void enPassantExceptions(ChessPosition start, ChessPosition end);
         bool moveValid(ChessPosition start, ChessPosition end);
         bool enPassant(ChessPosition start, ChessPosition end);
+        bool playerStuck();
 
         // will show all regular movement available from each position
         std::vector<ChessPosition> everyOpenMoveFrom(ChessPosition start);
@@ -82,7 +82,6 @@ class Chess {
 
         // helper method for check detection
         bool hypotheticalCheck(ChessPosition start, ChessPosition end);
-        bool detectCheckFromPosition(int x, int y, int player);
 };
 
 #endif

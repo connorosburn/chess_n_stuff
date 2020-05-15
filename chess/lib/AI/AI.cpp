@@ -1,30 +1,20 @@
 #include "AI.hpp"
 #include <memory>
 #include <iostream>
+#include <future>
 
 ChessMove AI(Chess chess, int searchDepth) {
     std::shared_ptr<Node> root(new Node(chess));
-    std::vector<std::shared_ptr<Node>> deepestNodes = {root};
-    for(int i = 0; i < searchDepth; i++) {
-        std::vector<std::shared_ptr<Node>> newDeepest;
-        for(auto& node : deepestNodes) {
-            std::map<ChessMove, std::shared_ptr<Node>> newNodes { node->getChildren() };
-            for(auto& [move, newNode] : newNodes) {
-                newDeepest.push_back(newNode);
-            }
-        }
-        deepestNodes = newDeepest;
-    }
 
-    double highestScore = 0;
-    ChessMove bestMove(ChessPosition(0, 0), ChessPosition(0, 0));
-    for(auto& [move, node] : root->getChildren()) {
-        double score = node->depthScore(chess.playerTurn());
-        if(score > highestScore) {
-            highestScore = score;
-            bestMove = move;
+    double score {0};
+    ChessMove move(ChessPosition(0, 0), ChessPosition(0, 0));
+    for(auto[moveChoice, child] : root->getChildren()) {
+        double newScore = child->minimize(score, 1.1, searchDepth);
+        if(newScore > score) {
+            score = newScore;
+            move = moveChoice;
         }
     }
-    std::cout<<"AI Move:\n"<<bestMove.start.x<<" "<<bestMove.start.y<<std::endl<<bestMove.end.x<<" "<<bestMove.end.y<<std::endl;
-    return bestMove;
+    std::cout<<"AI Move:\n"<<move.start.x<<" "<<move.start.y<<std::endl<<move.end.x<<" "<<move.end.y<<std::endl;
+    return move;
 }

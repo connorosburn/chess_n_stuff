@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ChessPiece from './ChessPiece.jsx';
 import EndReport from './EndReport.jsx';
 import PawnPromotionMenu from './PawnPromotionMenu.jsx';
@@ -34,15 +34,31 @@ function ChessBoard(props) {
                 }
             }
         } else if(!piece.null && !selectableTiles) {
-            selectable = piece.legalMoves.size() > 0;
+            selectable = !props.chess.isAI(piece) && piece.legalMoves.size() > 0;
         }
         return selectable;
     }
 
-    const promotePawn = (pieceType) => {
-        setRenderBoard(props.chess.move(selectedTile, pawnPromotionCandidate, pieceType));
+    useEffect (
+        () => {             
+            if(props.chess.updateAI()) {
+                setRenderBoard(props.chess.getBoard());
+                setEndState(props.chess.endState());
+            }
+        }, 
+        [renderBoard]
+    )
+
+
+    const move = (start, end, pieceType) => {
+        props.chess.move(start, end, pieceType);
+        setRenderBoard(props.chess.getBoard());
         deselectTile();
         setEndState(props.chess.endState());
+    }
+
+    const promotePawn = (pieceType) => {
+        move(selectedTile, pawnPromotionCandidate, pieceType);
         setDisplayMode("chess-grid");
     }
 
@@ -59,9 +75,7 @@ function ChessBoard(props) {
             setPawnPromotionCandidate(end);
             setDisplayMode("pawn-promotion");
         } else {
-            setRenderBoard(props.chess.move(start, end));
-            deselectTile();
-            setEndState(props.chess.endState());
+            move(start, end)
         }
     }
 
