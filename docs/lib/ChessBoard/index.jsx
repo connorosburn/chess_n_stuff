@@ -52,8 +52,8 @@ function ChessBoard(props) {
 
     const move = (start, end, pieceType) => {
         props.chess.move(start, end, pieceType);
-        setRenderBoard(props.chess.getBoard());
         deselectTile();
+        setRenderBoard(props.chess.getBoard());
         setEndState(props.chess.endState());
     }
 
