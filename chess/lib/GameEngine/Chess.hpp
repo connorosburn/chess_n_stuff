@@ -53,8 +53,8 @@ class Chess {
         EndState endState();
 
     private:
-        Chess(ChessPosition start, ChessPosition end, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber);
-        Chess(ChessPosition start, ChessPosition end, char type, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber);
+        Chess(ChessPosition start, ChessPosition end, Chess chessGame);
+        Chess(ChessPosition start, ChessPosition end, char type, Chess chessGame);
         int turnCount;
         ChessPiece& piece(ChessPosition position);
         std::vector<std::vector<ChessPiece>> board;

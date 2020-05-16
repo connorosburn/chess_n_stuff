@@ -9,13 +9,13 @@ Chess::Chess(): Chess(defaultBoard, 0) {
 
 }
 
-Chess::Chess(ChessPosition start, ChessPosition end, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber): 
-Chess(oldBoard, turnNumber) {
+Chess::Chess(ChessPosition start, ChessPosition end, Chess chessGame): 
+Chess(chessGame) {
     movePiece(start, end);
 }
 
-Chess::Chess(ChessPosition start, ChessPosition end, char type, std::vector<std::vector<ChessPiece>> oldBoard, int turnNumber): 
-Chess(oldBoard, turnNumber) {
+Chess::Chess(ChessPosition start, ChessPosition end, char type, Chess chessGame): 
+Chess(chessGame) {
     movePiece(start, end);
     piece(end) = ChessPiece(type, piece(end).getPlayer());
 }
@@ -137,19 +137,10 @@ std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
     if(!piece(start).isNull() && playerTurn() == piece(start).getPlayer()) {
         moves = everyOpenMoveFrom(start);
         moves.erase(std::remove_if(moves.begin(), moves.end(), [this, start](ChessPosition end) {
-            return this->hypotheticalCheck(start, end) || this->castleThreatened(start, end);
+            return this->hypotheticalCheck(start, end);
         }), moves.end());
     }
     return moves;
-}
-
-bool Chess::castleThreatened(ChessPosition start, ChessPosition end) {
-    bool threatened { false };
-    if(isCastleAttempt(start, end)) {
-        ChessPosition middle((end.x - start.x) / 2, start.y);
-        threatened = hypotheticalCheck(start, middle);
-    }
-    return threatened;
 }
 
 std::vector<Chess> Chess::everyHypotheticalGame() {
@@ -161,10 +152,10 @@ std::vector<Chess> Chess::everyHypotheticalGame() {
                 if(isPawnPromotion(start, end)) {
                     const std::vector<char> promoteable = {'r','b','n','q'};
                     for(char type : promoteable) {
-                        games.push_back({start, end, type, board, turnCount});
+                        games.push_back({start, end, type, (*this)});
                     }
                 } else {
-                    games.push_back({start, end, board, turnCount});
+                    games.push_back({start, end, (*this)});
                 }
             }
         }
@@ -400,7 +391,13 @@ bool Chess::hypotheticalCheck(ChessPosition start, ChessPosition end) {
     auto cachedBoard = board;
     piece(end) = piece(start);
     piece(start) = ChessPiece();
-    const bool check = inCheck(piece(end).getPlayer());
+    bool check = inCheck(piece(end).getPlayer());
+    if(isCastleAttempt(start, end)) {
+        board = cachedBoard;
+        ChessPosition middle((end.x - start.x) / 2, start.y);
+        piece(middle) = piece(end);
+        check = check || inCheck(piece(middle).getPlayer());
+    }
     board = cachedBoard;
     return check;
 }
