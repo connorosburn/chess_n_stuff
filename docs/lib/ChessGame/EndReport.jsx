@@ -4,7 +4,11 @@ function EndReport(props) {
 
     const report = (subject) => {
         if(subject) {
-            return <p className="end-text">{subject}</p>
+            return (
+                <div className="end-text">
+                    <p>{subject}</p>
+                </div>
+            );
         }
     }
 
@@ -20,7 +24,7 @@ function EndReport(props) {
     }
 
     return (
-        <div>
+        <div className="end-report">
             {renderReport()}
         </div>
     );

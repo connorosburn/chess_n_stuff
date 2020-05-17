@@ -1,44 +1,49 @@
+.chess-game {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+}
+
 .chess-board {
-    width: 750px;
-    height: 750px;
-
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
-
+    height: auto;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    align-items: space-evenly;
-    justify-content: space-evenly;
+    flex-flow: row wrap;
 }
 
-.board-row {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-    align-items: space-evenly;
-    justify-content: space-evenly;
-}
-
-.board-tile {
+.end-report {
+    background-color: grey;
     width: 100%;
     height: 100%;
-    border: none;
-    flex: 1;
+    margin: 0;
 }
 
-.fill {
-    width: 100%;
-    height: 100%;
-    border: none;
+
+.chess-piece:before {
+	content: '';
+    padding-top: 100%;
+    float: left;
 }
+
+
 
 .chess-piece {
-    font-size: 300%;
+    margin: 0;
+    text-align: center;
+    width: 12.5%;
+    height: 12.5%;
+    border: none;
+    font-size: 500%;
 }
+
+
+
+
 
 .light-tile {
     background-color: #EDD0A7;
@@ -65,7 +70,10 @@
 }
 
 .end-text {
-    font-size 50pt;
+    background-color: black;
+    color: white;
+    text-align: center;
+    font-size: 4em;
 }
 
 .promotion-tile {

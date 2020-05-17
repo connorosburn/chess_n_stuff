@@ -49,14 +49,12 @@ function ChessPiece(props) {
     }
 
     return (
-        <div className="fill">
-            <button 
-                className={`fill chess-piece ${tileClass()} ${props.pieceColor}`} 
-                onClick={clickTile}
-            >
-                {pieceCharacters(props.piece.type)}
-            </button>
-        </div>
+        <button 
+            className={`chess-piece ${tileClass()} ${props.pieceColor}`}
+            onClick={clickTile}
+        >
+            {pieceCharacters(props.piece.type)}
+        </button>
     );
 }
 

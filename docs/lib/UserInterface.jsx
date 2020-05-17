@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
-import ChessBoard from './ChessBoard';
+import ChessGame from './ChessGame';
 import ModeChoice from './ModeChoice';
 import Chess from './WasmWrapper/Chess.js';
+import AppHeader from './AppHeader'
 
 function UserInterface(props) {
     const[displayMode, setDisplayMode] = useState('choose-mode');
     const[chess, setChess] = useState(null);
 
     const choosePlayer = (player) => {
-        setChess(new Chess(Module, player));
+        setChess(new Chess(player));
         setDisplayMode('chess-game');
     }
 
@@ -17,13 +18,18 @@ function UserInterface(props) {
             case 'choose-mode':
                 return <ModeChoice choosePlayer={choosePlayer} />
             case 'chess-game':
-                return <ChessBoard chess={chess} />
+                return <ChessGame className="chess-game" chess={chess} />
             default:
                 return <div></div>
         }
     }
     return (
-        displayBody()
+        <div className="app-wrapper">
+            <AppHeader className="app-header" />
+            <div className="app-body">
+                {displayBody()}
+            </div>
+        </div>
     );
 }
 
