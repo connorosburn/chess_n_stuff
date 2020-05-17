@@ -50,6 +50,10 @@ int playerTurn() {
     return chess.playerTurn();
 }
 
+void resetGame() {
+    chess = Chess();
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::class_<ChessPosition>("Position")
         .constructor<int, int>()
@@ -78,4 +82,5 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("isPawnPromotion", &isPawnPromotion);
     emscripten::function("aiMove", &aiMove);
     emscripten::function("playerTurn", &playerTurn);
+    emscripten::function("resetGame", &resetGame);
 }

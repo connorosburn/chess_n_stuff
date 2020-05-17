@@ -5,7 +5,7 @@ function AppHeader(props) {
         <div className="app-header">
             <div className="left-margin"></div>
             <div className="title">
-                <p>Chess Playground</p>
+                <p>Chess N' Stuff</p>
             </div>
             <div className="login-buttons"></div>
         </div>

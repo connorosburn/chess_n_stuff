@@ -3,6 +3,7 @@ const boardSize = 8;
 class Chess {
     #player;
     constructor(player) {
+            Module.resetGame();
             this.#player = player;
     }
 
