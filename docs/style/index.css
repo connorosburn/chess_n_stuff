@@ -9,6 +9,7 @@ body {
 
 @media (orientation: portrait) {
     #single-page-app {
+        position: absolute;
         background-size: contain;
         height: 100%;
         width: 100%;
@@ -19,6 +20,7 @@ body {
 
 @media (orientation: landscape) {
     #single-page-app {
+        position: absolute;
         height: 100%;
         width: 50%;
         margin: auto;
@@ -28,6 +30,7 @@ body {
 
 @media (orientation: landscape) and (min-width: 1100px) {
     #single-page-app {
+        position: absolute;
         height: 100%;
         width: 35%;
         margin: auto;
@@ -36,16 +39,19 @@ body {
 }
   
 .app-wrapper {
+    position: relative;
     height: 100%;
     width: 100%;
     margin: 0;
     display: flex;
+    
     flex-direction: column;
-    justify-content: space-evenly;
-    align-items: space-evenly;
+    justify-content: center;
+    align-items: center;
 }
 
 .app-body {
+    position: relative;
     flex: 13;
     height: 100%;
     width: 100%;

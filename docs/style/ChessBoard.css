@@ -4,16 +4,19 @@
     margin: 0;
     position: relative;
     display: flex;
+    
     flex-direction: column; 
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .chess-board {
     height: auto;
+    position: absolute;
     width: 100%;
     display: flex;
-    flex-flow: row wrap;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .end-report {
@@ -25,6 +28,7 @@
 
 
 .chess-piece:before {
+    position: relative;
 	content: '';
     padding-top: 100%;
     float: left;
@@ -33,6 +37,7 @@
 
 
 .chess-piece {
+    position: relative;
     font-size: 110%;
     margin: 0;
     text-align: center;
