@@ -1,31 +1,39 @@
 import React, {useState} from 'react';
 import ChessGame from './ChessGame';
-import ModeChoice from './ModeChoice';
+import NewGame from './NewGame';
 import Chess from './WasmWrapper/Chess.js';
 import AppHeader from './AppHeader'
+import MenuBar from './MenuBar';
 
 function UserInterface(props) {
-    const[displayMode, setDisplayMode] = useState('choose-mode');
+    const[displayMode, setDisplayMode] = useState('new-game');
     const[chess, setChess] = useState(null);
+    const[gameActive, setGameActive] = useState(false);
 
     const choosePlayer = (player) => {
         setChess(new Chess(player));
-        setDisplayMode('chess-game');
+        setDisplayMode('active-game');
+        setGameActive(true);
     }
 
     const displayBody = () => {
         switch(displayMode) {
-            case 'choose-mode':
-                return <ModeChoice choosePlayer={choosePlayer} />
-            case 'chess-game':
-                return <ChessGame className="chess-game" chess={chess} />
+            case 'new-game':
+                return <NewGame choosePlayer={choosePlayer} />
+            case 'active-game':
+                return <ChessGame chess={chess} />
             default:
                 return <div></div>
         }
     }
     return (
         <div className="app-wrapper">
-            <AppHeader className="app-header" />
+            <AppHeader />
+            <MenuBar 
+                selected={displayMode} 
+                gameActive={gameActive}
+                setDisplayMode={setDisplayMode}
+            />
             <div className="app-body">
                 {displayBody()}
             </div>

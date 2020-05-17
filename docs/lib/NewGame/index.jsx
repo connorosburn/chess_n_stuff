@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ModeChoice(props) {
+function NewGame(props) {
     return (
         <div className="mode-choice">
             <button 
@@ -28,4 +28,4 @@ function ModeChoice(props) {
     );
 }
 
-export default ModeChoice;
+export default NewGame;
