@@ -3,7 +3,7 @@ import ChessPiece from './ChessPiece.jsx';
 import EndReport from './EndReport.jsx';
 import PawnPromotionMenu from './PawnPromotionMenu.jsx';
 
-function ChessBoard(props) {
+function ChessGame(props) {
     const[selectedTile, setSelectedTile] = useState(null);
     const[selectableTiles, setSelectableTiles] = useState(null);
     const[renderBoard, setRenderBoard] = useState(props.chess.getBoard());
@@ -40,7 +40,7 @@ function ChessBoard(props) {
     }
 
     useEffect (
-        () => {             
+        () => {     
             if(props.chess.updateAI()) {
                 setRenderBoard(props.chess.getBoard());
                 setEndState(props.chess.endState());
@@ -100,22 +100,20 @@ function ChessBoard(props) {
             <div className="chess-board">
                 {renderBoard.map((row, y) => { 
                     return (
-                        <div className="board-row" key={y}>
-                            {row.map((piece, x) => {
-                                return (
-                                    <ChessPiece
-                                        key={x}
-                                        piece={piece}
-                                        position={{x: x, y: y}}
-                                        selected={() => tileSelected(x, y)}
-                                        selectable={() => tileSelectable(x, y, piece)}
-                                        selectTile={() => selectTile(x, y, piece)}
-                                        deselectTile={deselectTile}
-                                        pieceColor={pieceColor(piece.player)}
-                                    />
-                                )
-                            })}
-                        </div>
+                        row.map((piece, x) => {
+                            return (
+                                <ChessPiece
+                                    key={x}
+                                    piece={piece}
+                                    position={{x: x, y: y}}
+                                    selected={() => tileSelected(x, y)}
+                                    selectable={() => tileSelectable(x, y, piece)}
+                                    selectTile={() => selectTile(x, y, piece)}
+                                    deselectTile={deselectTile}
+                                    pieceColor={pieceColor(piece.player)}
+                                />
+                            )
+                        })
                     )
                         
                 })}
@@ -139,9 +137,9 @@ function ChessBoard(props) {
     return(
         <div className="chess-game">
             {displayChessBoard()}
-            <EndReport endState={endState} pieceColor={pieceColor} />
+            <EndReport className="end-report" endState={endState} pieceColor={pieceColor} />
         </div>
     );
 }
 
-export default ChessBoard;
+export default ChessGame;
