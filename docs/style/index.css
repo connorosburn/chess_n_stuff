@@ -13,6 +13,7 @@ body {
         height: 100%;
         width: 100%;
         margin: 0;
+        font-size: 7vw;
     }
 }
 
@@ -21,6 +22,7 @@ body {
         height: 100%;
         width: 50%;
         margin: auto;
+        font-size: 3.5vw;
     }
 }
 
@@ -29,6 +31,7 @@ body {
         height: 100%;
         width: 35%;
         margin: auto;
+        font-size: 2.45vw;
     }
 }
   
