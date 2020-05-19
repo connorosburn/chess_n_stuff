@@ -1,11 +1,10 @@
 
 .app-header {
-    margin: auto;
-    flex: 1;
+    flex: 3;
     background-color: black;
     color: white;
     display: flex;
-    position: relative;
+    position: static;
     flex-direction: row;
     align-items: center;
     justify-content: center;
@@ -15,8 +14,8 @@
     width: 100%;
     height: 100%;
     margin: 0;
-    position: relative;
-    flex: 1;
+    position: static;
+    flex: 10;
     display: flex;
     
     align-items: center;
@@ -29,7 +28,7 @@
     width: 100%;
     height: 100%;
     margin: 0;
-    position: relative;
+    position: static;
     flex: 1;
 }
 
@@ -37,6 +36,6 @@
     width: 100%;
     height: 100%;
     margin: 0;
-    position: relative;
+    position: static;
     flex: 1;
 }
