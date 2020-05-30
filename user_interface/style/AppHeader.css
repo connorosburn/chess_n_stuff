@@ -1,0 +1,48 @@
+
+.app-header {
+    width: 100%;
+    margin: 0;
+    flex: 3;
+    background-color: black;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.title {
+    width: 100%;
+    flex: 1;
+    font-size: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.left-margin {
+    width: 100%;
+    flex: 1;
+}
+
+.login-buttons {
+    margin-top: 5%;
+    text-align: right;
+    font-size: 55%;
+    width: 100%;
+    flex: 1;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.login-button {
+    text-align: center;
+    width: 75%;
+    flex: 1;
+    margin-top: 12%;
+    margin-bottom: 12%;
+}

@@ -1,4 +1,5 @@
 #include "Chess.hpp"
+#include "../json.hpp"
 
 Chess::Chess(std::vector<std::vector<ChessPiece>> chessBoard, int turnNumber):
 board(chessBoard), turnCount(turnNumber) {
@@ -20,6 +21,40 @@ Chess(chessGame) {
     piece(end) = ChessPiece(type, piece(end).getPlayer());
 }
 
+Chess::Chess(std::string jsonString) {
+    using namespace nlohmann;
+    json j = json::parse(jsonString);
+    turnCount = j["turnCount"];
+    for(auto& row : j["board"]) {
+        board.emplace_back();
+        for(json& jsonPiece : row) {
+            board.back().emplace_back(jsonPiece);
+        }
+    }
+}
+
+std::string Chess::serialize() {
+    using namespace nlohmann;
+    json j;
+    j["board"] = json::array();
+    j["turnCount"] = turnCount;
+    for(auto row : board) {
+        j["board"].push_back(json::array());
+        for(auto piece : row) {
+            json jsonPiece;
+            jsonPiece["null"] = piece.isNull();
+            jsonPiece["enPassant"] = piece.enPassant();
+            std::string pieceType;
+            pieceType.push_back(piece.getType());
+            jsonPiece["type"] = pieceType;
+            jsonPiece["player"] = piece.getPlayer();
+            jsonPiece["moved"] = piece.hasMoved();
+            j["board"].back().push_back(jsonPiece);
+        }
+    }
+    return j.dump();
+}
+
 int Chess::getTurnCount() {
     return turnCount;
 }
@@ -34,6 +69,10 @@ int Chess::otherPlayer() {
 
 ChessPiece Chess::getPiece(std::string position) {
     return getPiece(ChessPosition(position));
+}
+
+ChessPiece Chess::getPiece(int x, int y) {
+    return getPiece(ChessPosition(x, y));
 }
 
 ChessPiece Chess::getPiece(ChessPosition position) {
@@ -386,19 +425,19 @@ bool Chess::inCheck(int player) {
     return check;
 }
 
-
 bool Chess::hypotheticalCheck(ChessPosition start, ChessPosition end) {
     auto cachedBoard = board;
     piece(end) = piece(start);
     piece(start) = ChessPiece();
     bool check = inCheck(piece(end).getPlayer());
-    if(isCastleAttempt(start, end)) {
-        board = cachedBoard;
-        ChessPosition middle((end.x - start.x) / 2, start.y);
-        piece(middle) = piece(end);
-        check = check || inCheck(piece(middle).getPlayer());
-    }
     board = cachedBoard;
+    if(isCastleAttempt(start, end)) {
+        int middleX = start.x + ((end.x - start.x) / 2);
+        ChessPosition middle(middleX, start.y);
+        piece(middle) = piece(start);
+        check = check || inCheck(piece(middle).getPlayer());
+        board = cachedBoard;
+    }
     return check;
 }
 

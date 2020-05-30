@@ -1,5 +1,6 @@
 #include "ChessPosition.hpp"
 #include <array>
+#include <algorithm>
 
 const std::array<char, 8> letteredPositions {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}};
 
