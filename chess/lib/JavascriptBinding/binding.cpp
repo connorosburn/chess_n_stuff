@@ -5,18 +5,27 @@
 
 Chess chess;
 
-struct ExposedPiece {
-    ExposedPiece() {};
-    ExposedPiece(ChessPiece piece, std::vector<ChessPosition> moves):
-    type({piece.getType()}), player(piece.getPlayer()), null(piece.isNull()), legalMoves(moves) {};
+struct DisplayPiece {
+    DisplayPiece() {};
+    DisplayPiece(ChessPiece piece, std::vector<ChessPosition> moves):
+    type({piece.getType()}), null(piece.isNull()), legalMoves(moves) {
+        if(piece.getPlayer() == 0) {
+            player = "white";
+        } else if(piece.getPlayer() == 1) {
+            player = "black";
+        }
+        if(null) {
+            type = " ";
+        }
+    };
     std::string type;
-    int player;
+    std::string player;
     bool null;
     std::vector<ChessPosition> legalMoves;
 };
 
-std::vector<ExposedPiece> getBoard() {
-    std::vector<ExposedPiece> pieces;
+std::vector<DisplayPiece> getBoard() {
+    std::vector<DisplayPiece> pieces;
     auto board = chess.getBoard();
     for(int y = 0; y < board.size(); y++) {
         for(int x = 0; x < board[y].size(); x++) {
@@ -46,12 +55,24 @@ void aiMove() {
     chess = AI(chess);
 }
 
-int playerTurn() {
-    return chess.playerTurn();
+std::string playerTurn() {
+    if(chess.playerTurn() == 0) {
+        return "white";
+    } else {
+        return "black";
+    }
 }
 
 void resetGame() {
     chess = Chess();
+}
+
+void fromSnapshot(std::string snapshot) {
+    chess = Chess(snapshot);
+}
+
+std::string serialize() {
+    return chess.serialize();
 }
 
 EMSCRIPTEN_BINDINGS(my_module) {
@@ -62,13 +83,13 @@ EMSCRIPTEN_BINDINGS(my_module) {
         ;
     emscripten::register_vector<ChessPosition>("PositionVector");
 
-    emscripten::value_object<ExposedPiece>("Piece")
-        .field("type", &ExposedPiece::type)
-        .field("player", &ExposedPiece::player)
-        .field("null", &ExposedPiece::null)
-        .field("legalMoves", &ExposedPiece::legalMoves)
+    emscripten::value_object<DisplayPiece>("Piece")
+        .field("type", &DisplayPiece::type)
+        .field("player", &DisplayPiece::player)
+        .field("null", &DisplayPiece::null)
+        .field("legalMoves", &DisplayPiece::legalMoves)
         ;
-    emscripten::register_vector<ExposedPiece>("PieceVector");
+    emscripten::register_vector<DisplayPiece>("PieceVector");
 
     emscripten::value_object<EndState>("EndState")
         .field("winner", &EndState::winner)
@@ -83,4 +104,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("aiMove", &aiMove);
     emscripten::function("playerTurn", &playerTurn);
     emscripten::function("resetGame", &resetGame);
+    emscripten::function("fromSnapshot", &fromSnapshot);
+    emscripten::function("serialize", &serialize);
 }

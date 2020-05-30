@@ -244,3 +244,30 @@ TEST_CASE("It follows castling rules") {
     REQUIRE(chess.getPiece("c8").toString() == "k1");
     REQUIRE(chess.getPiece("d8").toString() == "r1");
 }
+
+TEST_CASE("It serializes and deserializes properly") {
+    Chess chess;
+
+    REQUIRE(chess.move("e2", "e3"));
+    REQUIRE(chess.move("d7", "d5"));
+    REQUIRE(chess.move("f1", "e2"));
+
+    std::string jsonString = chess.serialize();
+
+    Chess deserializedChess(jsonString);
+
+    for(int y = 0; y < boardSize; y++) {
+        for(int x = 0; x < boardSize; x++) {
+            ChessPiece pieceOne = chess.getPiece(x, y);
+            ChessPiece pieceTwo = deserializedChess.getPiece(x, y);
+            REQUIRE(pieceOne.isNull() == pieceTwo.isNull());
+            REQUIRE(pieceOne.enPassant() == pieceTwo.enPassant());
+            REQUIRE(pieceOne.getPlayer() == pieceTwo.getPlayer());
+            REQUIRE(pieceOne.getType() == pieceTwo.getType());
+            REQUIRE(pieceOne.hasMoved() == pieceTwo.hasMoved());
+        }
+    }
+
+    REQUIRE(chess.getTurnCount() == deserializedChess.getTurnCount());
+    
+}

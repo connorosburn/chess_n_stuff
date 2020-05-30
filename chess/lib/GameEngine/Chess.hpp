@@ -36,6 +36,8 @@ class Chess {
     public:
         Chess();
         Chess(std::vector<std::vector<ChessPiece>> chessBoard, int turnNumber);
+        Chess(std::string jsonString);
+        std::string serialize();
         int getTurnCount();
         int playerTurn();
         int otherPlayer();
@@ -45,6 +47,7 @@ class Chess {
         std::vector<Chess> everyHypotheticalGame();
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
+        ChessPiece getPiece(int x, int y);
         bool move(std::string start, std::string end);
         bool move(std::string start, std::string end, char pieceType);
         bool move(ChessPosition start, ChessPosition end);

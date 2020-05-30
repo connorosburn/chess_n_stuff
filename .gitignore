@@ -1,4 +1,13 @@
-tests
 .vscode
-docs/package-lock.json
-docs/node_modules
+user_interface/package-lock.json
+user_interface/node_modules
+deploy
+pybind11
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt
+CMakeLists.txt
+Makefile
+*/__pycache__
+multiplayer_backend/backenv
+scripts.sh

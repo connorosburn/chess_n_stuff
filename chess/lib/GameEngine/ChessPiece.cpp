@@ -21,6 +21,25 @@ ChessPiece::ChessPiece(char pieceType, int playerNumber): null(false), moved(fal
     }
 }
 
+ChessPiece::ChessPiece(json j):
+null(j["null"]),
+enpassant(j["enPassant"]),
+type(std::string(j["type"])[0]),
+player(j["player"]),
+moved(j["moved"]) {
+    
+}
+
+json ChessPiece::serialize() {
+    json jsonPiece;
+    jsonPiece["null"] = null;
+    jsonPiece["enPassant"] = enpassant;
+    jsonPiece["type"] = type;
+    jsonPiece["player"] = player;
+    jsonPiece["moved"] = moved;
+    return jsonPiece;
+}
+
 bool ChessPiece::pieceValid(char pieceType, int playerNumber) {
     bool valid = std::any_of(pieceTypes.begin(), pieceTypes.end(), 
         [pieceType](char p) { 
