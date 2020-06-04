@@ -5,22 +5,22 @@ function ChessPiece(props) {
         let character = '';
         switch(type) {
             case 'r':
-                character = '\u265C';
+                character = '\u265C\uFE0E';
                 break;
             case 'n':
-                character = '\u265E';
+                character = '\u265E\uFE0E';
                 break;
             case 'b':
-                character = '\u265D';
+                character = '\u265D\uFE0E';
                 break;
             case 'q':
-                character = '\u265B';
+                character = '\u265B\uFE0E';
                 break;
             case 'k':
-                character = '\u265A';
+                character = '\u265A\uFE0E';
                 break;
             case 'p':
-                character = '\u265F'; 
+                character = '\u265F\uFE0E'; 
                 break;
             default: 
                 character = ' ';
@@ -50,10 +50,12 @@ function ChessPiece(props) {
 
     return (
         <button 
-            className={`chess-piece ${tileClass()} ${props.pieceColor}`}
+            className={`chess-tile ${tileClass()}`}
             onClick={clickTile}
         >
-            {pieceCharacters(props.piece.type)}
+            <div className={`chess-piece ${props.pieceColor}`}>
+                {pieceCharacters(props.piece.type)}
+            </div>
         </button>
     );
 }

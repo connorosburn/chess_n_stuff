@@ -8,6 +8,6 @@ CMakeFiles
 CMakeCache.txt
 CMakeLists.txt
 Makefile
-*/__pycache__
+__pycache__/
 multiplayer_backend/backenv
 scripts.sh

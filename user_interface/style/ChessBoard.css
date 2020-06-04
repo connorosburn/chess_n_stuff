@@ -23,28 +23,34 @@
 }
 
 
-.chess-piece:before {
+.chess-tile:before {
     pointer-events: none;
 	content: '';
     padding-top: 100%;
     float: left;
 }
 
-
-
-.chess-piece {
+.chess-tile {
     pointer-events: auto;
-    font-size: 110%;
     margin: 0;
     text-align: center;
     width: 12.5%;
     border: none;
     z-index: 10;
+    font-size: 0%;
+}
+
+.chess-piece {
+    font-size: 40;
 }
 
 
 
-
+@media (orientation: portrait) and (max-width: 700px) {
+    .chess-piece {
+        font-size: 25;
+    }
+}
 
 .light-tile, .light-tile:hover {
     background-color: #EDD0A7;
