@@ -1,12 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import ChessGame from './ChessGame';
+import ActiveGame from './ActiveGame';
 import NewGame from './NewGame';
 import AppHeader from './AppHeader'
 import MenuBar from './MenuBar';
 import Registration from './Users/Registration.jsx';
 import Login from './Users/Login.jsx';
 import OnlineGames from './OnlineGames';
-import LiveGameListener from './RequestHandler/socket.js'
+import LiveGameListener from './request/socket.js';
+import {checkLogin, logout, getGame, startGame} from './request/fetch'
 
 function UserInterface(props) {
     const[displayMode, setDisplayMode] = useState('new-game');
@@ -14,10 +15,11 @@ function UserInterface(props) {
     const[loginChecked, setLoginChecked] = useState(false);
     const[activeGameConfig, setActiveGameConfig] = useState(null);
     const[resetGame, setResetGame] = useState(false);
+    const [gameType, setGameType] = useState('chess');
 
     useEffect(() => {
         const loginCheck = async () => {
-            let userInfo = await props.requestHandler.checkLogin();
+            let userInfo = await checkLogin();
             if(Object.keys(userInfo).length > 0) {
                 setUserInfo(userInfo);
             }
@@ -28,7 +30,7 @@ function UserInterface(props) {
 
     const setUpGame = async (config) => {
         if(config.hasOwnProperty('gameID')) {
-            let response = await props.requestHandler.getGame(config.gameID);
+            let response = await getGame(config.gameID);
             let data = await response.json();
             config.snapshot = data.snapshot;
         }
@@ -42,16 +44,12 @@ function UserInterface(props) {
             case 'online-games':
                 return (
                     <OnlineGames 
-                        getGames={() => props.requestHandler.getGames()}
                         setUpGame={setUpGame}
                     />
                 );
             case 'registration':
                 return (
-                    <Registration 
-                        register={(username, password, passwordConfirmation) => {
-                            return props.requestHandler.register(username, password, passwordConfirmation);
-                        }}
+                    <Registration
                         resetPage={() => setDisplayMode('new-game')}
                         setUserInfo={setUserInfo}
                     />
@@ -59,9 +57,6 @@ function UserInterface(props) {
             case 'login':
                 return (
                     <Login
-                        login={(username, password) => {
-                            return props.requestHandler.login(username, password);
-                        }}
                         resetPage={() => setDisplayMode('new-game')}
                         setUserInfo={setUserInfo}
                     />
@@ -76,7 +71,7 @@ function UserInterface(props) {
                 );
             case 'active-game':
                 return (
-                    <ChessGame
+                    <ActiveGame
                         config={activeGameConfig}
                         resetGame={() => {
                             const reset = resetGame;
@@ -84,7 +79,7 @@ function UserInterface(props) {
                             return reset;
                         }}
                         startGame={async (move) => {
-                            let response = await props.requestHandler.startGame(move, activeGameConfig.opponent);
+                            let response = await startGame(move, activeGameConfig.opponent);
                             if(response.status == 200) {
                                 let newConfig = activeGameConfig;
                                 let data = await response.json();
@@ -96,7 +91,7 @@ function UserInterface(props) {
                                 setActiveGameConfig(null);
                             }
                         }}
-                        sendMove={async (move) => await props.requestHandler.sendMove(activeGameConfig.gameID, move)}
+                        gameType={gameType}
                     />
                 );
             default:
@@ -113,7 +108,7 @@ function UserInterface(props) {
                 logout={async () => {
                         setUserInfo(null)
                         setActiveGameConfig(null)
-                        await props.requestHandler.logout();
+                        await logout();
                     }
                 }
             />

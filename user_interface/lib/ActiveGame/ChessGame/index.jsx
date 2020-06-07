@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ChessPiece from './ChessPiece.jsx';
 import EndReport from './EndReport.jsx';
 import PawnPromotionMenu from './PawnPromotionMenu.jsx';
+import {sendMove} from '../../request/fetch';
 
 function ChessGame(props) {
     const[selectedTile, setSelectedTile] = useState(null);
@@ -95,7 +96,7 @@ function ChessGame(props) {
             if(newGame) {
                 response = await props.startGame(move);
             } else {
-                response = await props.sendMove(move);
+                response = await sendMove(props.config.gameID, move);
             }
         }
         setNewGame(false);
