@@ -78,18 +78,15 @@ function UserInterface(props) {
                             setResetGame(false);
                             return reset;
                         }}
-                        startGame={async (move) => {
-                            let response = await startGame(move, activeGameConfig.opponent);
-                            if(response.status == 200) {
-                                let newConfig = activeGameConfig;
-                                let data = await response.json();
-                                newConfig.gameID = data.id;
-                                newConfig.listener = new LiveGameListener(data.id);
-                                setActiveGameConfig(newConfig);
-                            } else {
-                                setDisplayMode('new-game')
-                                setActiveGameConfig(null);
-                            }
+                        nullifyGame={() => {
+                            setDisplayMode('new-game')
+                            setActiveGameConfig(null);
+                        }}
+                        setGameID={(id) => {
+                            let newConfig = activeGameConfig;
+                            newConfig.gameID = id;
+                            newConfig.listener = new LiveGameListener(id);
+                            setActiveGameConfig(newConfig);
                         }}
                         gameType={gameType}
                     />
