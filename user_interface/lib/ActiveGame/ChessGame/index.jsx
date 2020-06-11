@@ -13,6 +13,7 @@ function ChessGame(props) {
     const[pawnPromotionCandidate, setPawnPromotionCandidate] = useState(null);
     const[playerTurn, setPlayerTurn] = useState(null);
     const[newGame, setNewGame] = useState(false);
+    const[inverted, setInverted] = useState(false);
 
     useEffect(() => {
         if(props.config.listener) {
@@ -54,7 +55,11 @@ function ChessGame(props) {
 
     chess.onmessage = (e) => {
         deselectTile();
-        setRenderBoard(e.data.board);
+        let board = e.data.board;
+        if(inverted) {
+            board = invertBoard(board);
+        }
+        setRenderBoard(board);
         setPlayerTurn(e.data.playerTurn);
         if(e.data.hasOwnProperty('endState')) {
             setEndState(e.data.endState);
@@ -107,6 +112,14 @@ function ChessGame(props) {
         setDisplayMode("chess-grid");
     }
 
+    const getPiece = (x, y) => {
+        if(inverted) {
+            return renderBoard[7 - y][7 - x];
+        } else {
+            return renderBoard[y][x];
+        }
+    }
+
     const movePiece = (x, y) => {
         const start = {
             x: selectedTile.x,
@@ -116,7 +129,7 @@ function ChessGame(props) {
             x: x,
             y: y
         }
-        const piece = renderBoard[selectedTile.y][selectedTile.x];
+        const piece = getPiece(selectedTile.x, selectedTile.y);
         if(piece.type == "p" && (y == 7 || y == 0)) {
             setPawnPromotionCandidate(end);
             setDisplayMode("pawn-promotion");
@@ -145,9 +158,15 @@ function ChessGame(props) {
         if(renderBoard) {
             return(
                 <div className="chess-board">
-                    {renderBoard.map((row, y) => { 
+                    {renderBoard.map((row, y) => {
+                        if(inverted) {
+                            y = renderBoard.length - 1 - y;
+                        }
                         return (
                             row.map((piece, x) => {
+                                if(inverted) {
+                                    x = renderBoard[y].length - 1 - x;
+                                }
                                 return (
                                     <ChessPiece
                                         key={x}
@@ -188,9 +207,29 @@ function ChessGame(props) {
         }
     }
 
+    const invertBoard = (board) => {
+        let invertedBoard = board.map((row) => {
+            row.reverse();
+            return row;
+        })
+        invertedBoard.reverse();
+        return invertedBoard;
+    }
+
+    const toggleInversion = () => {
+        setInverted(!inverted);
+        setRenderBoard(invertBoard(renderBoard));
+    }
+
     return(
         <div className="chess-game">
             {displayChessBoard()}
+            <button 
+                onClick={toggleInversion}
+                className="chess-inversion-button"
+            >
+                Invert Board
+            </button>
             {displayEndReport()}
         </div>
     );
