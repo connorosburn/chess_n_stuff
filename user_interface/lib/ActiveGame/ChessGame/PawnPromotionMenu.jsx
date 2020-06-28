@@ -6,25 +6,25 @@ function PawnPromotionMenu(props) {
             <p>Choose type to promote pawn to</p>
             <button 
                 className="promotion-tile"
-                onClick={() => props.promote('r')}
+                onClick={() => props.promote('rook')}
             >
                 {'\u265C'}
             </button>
             <button
                 className="promotion-tile"
-                onClick={() => props.promote('n')}
+                onClick={() => props.promote('knight')}
             >
                 {'\u265E'}
             </button>
             <button 
                 className="promotion-tile"
-                onClick={() => props.promote('b')}
+                onClick={() => props.promote('bishop')}
             >
                 {'\u265D'}
             </button>
             <button 
                 className="promotion-tile"
-                onClick={() => props.promote('q')}
+                onClick={() => props.promote('queen')}
             >
                 {'\u265B'}
             </button>

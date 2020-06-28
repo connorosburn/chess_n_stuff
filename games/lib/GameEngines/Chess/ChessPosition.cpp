@@ -1,8 +1,8 @@
 #include "ChessPosition.hpp"
-#include <array>
+#include <vector>
 #include <algorithm>
 
-const std::array<char, 8> letteredPositions {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}};
+const std::vector<char> letteredPositions { {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'} };
 
 ChessPosition::ChessPosition(std::string notationString) {
     if(notationStringValid(notationString)) {

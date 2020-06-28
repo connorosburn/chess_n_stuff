@@ -26,7 +26,7 @@ function ChessGame(props) {
         if(props.resetGame()) {
             let strippedConfig = props.config;
             strippedConfig.listener = null;
-            chess.postMessage({
+            game.postMessage({
                 action: 'resetGame',
                 config: strippedConfig
             });
@@ -34,7 +34,7 @@ function ChessGame(props) {
                 setNewGame(true);
             }
         } else {
-            chess.postMessage({});
+            game.postMessage({});
         }
         return () => {
             if(props.config.listener) {
@@ -45,7 +45,7 @@ function ChessGame(props) {
 
     const websocketListener = (e) => {
         const data = JSON.parse(e.data);
-        chess.postMessage({
+        game.postMessage({
             action: 'move',
             start: data.start,
             end: data.end,
@@ -53,9 +53,9 @@ function ChessGame(props) {
         });
     }
 
-    chess.onmessage = (e) => {
+    game.onmessage = (e) => {
         deselectTile();
-        let board = e.data.board;
+        let board = JSON.parse(e.data.snapshot).board;
         if(inverted) {
             board = invertBoard(board);
         }
@@ -85,7 +85,7 @@ function ChessGame(props) {
     }
 
     const move = async (start, end, pieceType) => {
-        chess.postMessage({
+        game.postMessage({
             action: 'move',
             start: start, 
             end: end, 

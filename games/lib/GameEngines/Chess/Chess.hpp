@@ -11,38 +11,43 @@
 
 const std::vector<std::vector<ChessPiece>> defaultBoard {
     {
-        {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece('b', 1), ChessPiece('q', 1), ChessPiece('k', 1), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
-        {ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1), ChessPiece('p', 1)},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
-        {ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0)},
-        {ChessPiece('r', 0), ChessPiece('n', 0), ChessPiece('b', 0), ChessPiece('q', 0), ChessPiece('k', 0), ChessPiece('b', 0), ChessPiece('n', 0), ChessPiece('r', 0)}
+        {
+            ChessPiece(PieceType::Rook, Player::Black), 
+            ChessPiece(PieceType::Knight, Player::Black), 
+            ChessPiece(PieceType::Bishop, Player::Black), 
+            ChessPiece(PieceType::Queen, Player::Black), 
+            ChessPiece(PieceType::King, Player::Black), 
+            ChessPiece(PieceType::Bishop, Player::Black), 
+            ChessPiece(PieceType::Knight, Player::Black), 
+            ChessPiece(PieceType::Rook, Player::Black)
+        },
+        std::vector<ChessPiece>(boardSize, ChessPiece(PieceType::Pawn, Player::Black)),
+        std::vector<ChessPiece>(boardSize, ChessPiece()),
+        std::vector<ChessPiece>(boardSize, ChessPiece()),
+        std::vector<ChessPiece>(boardSize, ChessPiece()),
+        std::vector<ChessPiece>(boardSize, ChessPiece()),
+        std::vector<ChessPiece>(boardSize, ChessPiece(PieceType::Pawn, Player::White)),
+        {
+            ChessPiece(PieceType::Rook, Player::White), 
+            ChessPiece(PieceType::Knight, Player::White), 
+            ChessPiece(PieceType::Bishop, Player::White), 
+            ChessPiece(PieceType::Queen, Player::White), 
+            ChessPiece(PieceType::King, Player::White), 
+            ChessPiece(PieceType::Bishop, Player::White), 
+            ChessPiece(PieceType::Knight, Player::White), 
+            ChessPiece(PieceType::Rook, Player::White)
+        }
     }
-};
-
-struct EndState {
-    EndState(std::string endCondition, int gameWinner):
-        condition(endCondition), winner(gameWinner) {};
-    EndState(std::string endCondition):
-        EndState(endCondition, -1) {};
-    EndState():
-        EndState("", -1) {};
-    std::string condition;
-    int winner;
 };
 
 class Chess : public Game {
     public:
         Chess();
         Chess(std::vector<std::vector<ChessPiece>> chessBoard, int turnNumber);
-        Chess(std::string jsonString);
-        std::string serialize();
+        Chess(std::string snapshot);
+        std::string getSnapshot();
         int getTurnCount();
-        int playerTurn();
-        int otherPlayer();
-        bool inCheck(int player);
+        bool inCheck(Player player);
         std::vector<std::vector<ChessPiece>> getBoard();
         std::vector<ChessPosition> everyLegalMoveFrom(ChessPosition start);
         std::vector<std::shared_ptr<Game>> everyHypotheticalGame();
@@ -50,16 +55,17 @@ class Chess : public Game {
         ChessPiece getPiece(ChessPosition position);
         ChessPiece getPiece(int x, int y);
         bool move(std::string start, std::string end);
-        bool move(std::string start, std::string end, char pieceType);
+        bool move(std::string start, std::string end, PieceType pieceType);
         bool move(ChessPosition start, ChessPosition end);
-        bool move(ChessPosition start, ChessPosition end, char pieceType);
+        bool move(ChessPosition start, ChessPosition end, PieceType pieceType);
+        bool move(std::string chessMove);
         bool isPawnPromotion(ChessPosition start, ChessPosition end);
         EndState endState();
-        double getScore(int player);
+        double getScore(Player player);
 
     private:
         Chess(ChessPosition start, ChessPosition end, Chess chessGame);
-        Chess(ChessPosition start, ChessPosition end, char type, Chess chessGame);
+        Chess(ChessPosition start, ChessPosition end, PieceType type, Chess chessGame);
         int turnCount;
         ChessPiece& piece(ChessPosition position);
         std::vector<std::vector<ChessPiece>> board;
@@ -94,7 +100,7 @@ class Chess : public Game {
         // helper method for check detection
         bool hypotheticalCheck(ChessPosition start, ChessPosition end);
 
-        double scorePieces(int player);
+        double scorePieces(Player player);
 };
 
 #endif

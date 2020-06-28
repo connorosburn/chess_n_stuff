@@ -3,79 +3,68 @@
 #include <array>
 #include <algorithm>
 
-const std::array<char, 6> pieceTypes {{'p', 'r', 'n', 'b', 'q', 'k'}};
 
-ChessPiece::ChessPiece(char pieceType, int playerNumber): null(false), moved(false), enpassant(false) {
-    pieceType = std::tolower(pieceType);
-    if(pieceValid(pieceType, playerNumber)) {
-        type = pieceType;
-        player = playerNumber;
-        enpassant = false;
-    } else if(pieceType == 'e') {
-        type = 'e';
-        enpassant = true;
-        null = true;
-        player = playerNumber;
-    } else {
-        throw "Invalid chess piece";
+ChessPiece::ChessPiece(PieceType pieceType, Player playerColor): type(pieceType), player(playerColor), moved(false) {
+
+}
+
+ChessPiece::ChessPiece(): type(PieceType::Null), player(Player::Null) {
+
+}
+
+ChessPiece::ChessPiece(nlohmann::json j):
+type(typeFromString(j["type"])), 
+player(playerFromString(j["player"])),
+moved(j["moved"]) {
+
+}
+
+std::string typeString(PieceType type) {
+    switch(type) {
+        case PieceType::Pawn:
+            return "pawn";
+            break;
+        case PieceType::Rook:
+            return "rook";
+            break;
+        case PieceType::Knight:
+            return "knight";
+            break;
+        case PieceType::Queen:
+            return "queen";
+            break;
+        case PieceType::King:
+            return "king";
+            break;
+        case PieceType::Bishop:
+            return "bishop";
+            break;
+        case PieceType::EnPassant:
+            return "en-passant";
+            break;
+        case PieceType::Null:
+            return "null";
+            break;
     }
 }
 
-ChessPiece::ChessPiece(json j):
-null(j["null"]),
-enpassant(j["enPassant"]),
-type(std::string(j["type"])[0]),
-player(j["player"]),
-moved(j["moved"]) {
-    
-}
-
-json ChessPiece::serialize() {
-    json jsonPiece;
-    jsonPiece["null"] = null;
-    jsonPiece["enPassant"] = enpassant;
-    jsonPiece["type"] = type;
-    jsonPiece["player"] = player;
+nlohmann::json ChessPiece::serialize() {
+    nlohmann::json jsonPiece;
+    jsonPiece["type"] = typeString(type);
+    jsonPiece["player"] = playerString(player);
     jsonPiece["moved"] = moved;
     return jsonPiece;
 }
 
-bool ChessPiece::pieceValid(char pieceType, int playerNumber) {
-    bool valid = std::any_of(pieceTypes.begin(), pieceTypes.end(), 
-        [pieceType](char p) { 
-            return p == pieceType; 
-        }
-    );
-    valid = valid && (playerNumber == 0 || playerNumber == 1);
-    return valid;
+bool ChessPiece::isEmpty() {
+    return type == PieceType::Null || type == PieceType::EnPassant;
 }
 
-ChessPiece::ChessPiece(): null(true), enpassant(false), type('e') {
-
-}
-
-std::string ChessPiece::toString() {
-    if(null) {
-        return "";
-    }
-    std::stringstream outputStream;
-    outputStream << type << player;
-    return outputStream.str();
-}
-
-bool ChessPiece::isNull() {
-    return null;
-}
-
-bool ChessPiece::enPassant() {
-    return enpassant;
-}
-
-int ChessPiece::getPlayer() {
+Player ChessPiece::getPlayer() {
     return player;
 }
 
-char ChessPiece::getType() {
+PieceType ChessPiece::getType() {
     return type;
 }
 
@@ -85,4 +74,24 @@ bool ChessPiece::hasMoved() {
 
 void ChessPiece::move() {
     moved = true;
+}
+
+PieceType ChessPiece::typeFromString(std::string typeString) {
+    if(typeString == "pawn") {
+        return PieceType::Pawn;
+    } else if(typeString == "rook") {
+        return PieceType::Rook;
+    } else if(typeString == "knight") {
+        return PieceType::Knight;
+    } else if(typeString == "bishop") {
+        return PieceType::Bishop;
+    } else if(typeString == "queen") {
+        return PieceType::Queen;
+    } else if(typeString == "king") {
+        return PieceType::King;
+    } else if(typeString == "en-passant") {
+        return PieceType::EnPassant;
+    } else {
+        return PieceType::Null;
+    }
 }

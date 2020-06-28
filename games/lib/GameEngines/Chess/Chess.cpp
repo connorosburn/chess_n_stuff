@@ -1,5 +1,4 @@
 #include "Chess.hpp"
-#include "../../json.hpp"
 
 Chess::Chess(std::vector<std::vector<ChessPiece>> chessBoard, int turnNumber):
 board(chessBoard), turnCount(turnNumber) {
@@ -15,7 +14,7 @@ Chess(chessGame) {
     movePiece(start, end);
 }
 
-Chess::Chess(ChessPosition start, ChessPosition end, char type, Chess chessGame): 
+Chess::Chess(ChessPosition start, ChessPosition end, PieceType type, Chess chessGame): 
 Chess(chessGame) {
     movePiece(start, end);
     piece(end) = ChessPiece(type, piece(end).getPlayer());
@@ -33,7 +32,7 @@ Chess::Chess(std::string jsonString) {
     }
 }
 
-std::string Chess::serialize() {
+std::string Chess::getSnapshot() {
     using namespace nlohmann;
     json j;
     j["board"] = json::array();
@@ -41,15 +40,7 @@ std::string Chess::serialize() {
     for(auto row : board) {
         j["board"].push_back(json::array());
         for(auto piece : row) {
-            json jsonPiece;
-            jsonPiece["null"] = piece.isNull();
-            jsonPiece["enPassant"] = piece.enPassant();
-            std::string pieceType;
-            pieceType.push_back(piece.getType());
-            jsonPiece["type"] = pieceType;
-            jsonPiece["player"] = piece.getPlayer();
-            jsonPiece["moved"] = piece.hasMoved();
-            j["board"].back().push_back(jsonPiece);
+            j["board"].back().push_back(piece.serialize());
         }
     }
     return j.dump();
@@ -57,14 +48,6 @@ std::string Chess::serialize() {
 
 int Chess::getTurnCount() {
     return turnCount;
-}
-
-int Chess::playerTurn() {
-    return turnCount % 2;
-}
-
-int Chess::otherPlayer() {
-    return (turnCount + 1) % 2;
 }
 
 ChessPiece Chess::getPiece(std::string position) {
@@ -87,10 +70,10 @@ std::vector<std::vector<ChessPiece>> Chess::getBoard() {
     return board;
 }
 
-int pawnDirection(int player) {
-    if(player == 0) {
+int pawnDirection(Player player) {
+    if(player == Player::White) {
         return -1;
-    } else if(player == 1) {
+    } else if(player == Player::Black) {
         return 1;
     } else {
         throw "Invalid player";
@@ -125,14 +108,14 @@ void Chess::enPassantExceptions(ChessPosition start, ChessPosition end) {
             { ChessPosition(i, 2), ChessPosition(i, 5) }
         };
         for(auto target : enPassantTargets) {
-            if(piece(target).enPassant()) {
+            if(piece(target).getType() == PieceType::EnPassant) {
                 piece(target) = ChessPiece();
             }
         }
     }
     
-    if(piece(start).getType() == 'p' && std::abs(start.y - end.y) == 2) {
-        piece({start.x, start.y + yDirection}) = ChessPiece('e', piece(start).getPlayer());
+    if(piece(start).getType() == PieceType::Pawn && std::abs(start.y - end.y) == 2) {
+        piece({start.x, start.y + yDirection}) = ChessPiece(PieceType::EnPassant, piece(start).getPlayer());
     }
 }
 
@@ -141,12 +124,12 @@ bool Chess::move(std::string start, std::string end) {
     return move(ChessPosition(start), ChessPosition(end));
 }
 
-bool Chess::move(std::string start, std::string end, char pieceType) {
+bool Chess::move(std::string start, std::string end, PieceType pieceType) {
     return move(ChessPosition(start), ChessPosition(end), pieceType);
 }
 
 bool Chess::isPawnPromotion(ChessPosition start, ChessPosition end) {
-    return !piece(start).isNull() && piece(start).getType() == 'p' && (end.y == 0 || end.y == boardSize - 1);
+    return !piece(start).isEmpty() && piece(start).getType() == PieceType::Pawn && (end.y == 0 || end.y == boardSize - 1);
 }
 
 bool Chess::move(ChessPosition start, ChessPosition end) {
@@ -157,11 +140,11 @@ bool Chess::move(ChessPosition start, ChessPosition end) {
     return valid;
 }
 
-bool Chess::move(ChessPosition start, ChessPosition end, char pieceType) {
+bool Chess::move(ChessPosition start, ChessPosition end, PieceType pieceType) {
     bool valid { moveValid(start, end) && isPawnPromotion(start, end) };
-    const std::vector<char> promotable {{'r','b','n','q'}};
+    const std::vector<PieceType> promotable {{PieceType::Rook, PieceType::Bishop, PieceType::Knight, PieceType::Queen}};
     valid = valid && std::any_of(promotable.begin(), promotable.end(), 
-        [pieceType](char t) {
+        [pieceType](PieceType t) {
             return t == pieceType;
         });
     if(valid) {
@@ -171,9 +154,22 @@ bool Chess::move(ChessPosition start, ChessPosition end, char pieceType) {
     return valid;
 }
 
+bool Chess::move(std::string chessMove) {
+    using namespace nlohmann;
+    json j = json::parse(chessMove);
+    turnCount = j["turnCount"];
+    ChessPosition start(j["start"]["x"], j["start"]["y"]);
+    ChessPosition end(j["end"]["x"], j["end"]["y"]);
+    if(j.contains("pawnPromotion")) {
+        return move(start, end, ChessPiece::typeFromString(j["pawnPromotion"]));
+    } else {
+        return move(start, end);
+    }
+}
+
 std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
     std::vector<ChessPosition> moves;
-    if(!piece(start).isNull() && playerTurn() == piece(start).getPlayer()) {
+    if(!piece(start).isEmpty() && playerTurn() == piece(start).getPlayer()) {
         moves = everyOpenMoveFrom(start);
         moves.erase(std::remove_if(moves.begin(), moves.end(), [this, start](ChessPosition end) {
             return this->hypotheticalCheck(start, end);
@@ -189,8 +185,8 @@ std::vector<std::shared_ptr<Game>> Chess::everyHypotheticalGame() {
             ChessPosition start(x, y);
             for(auto end : everyLegalMoveFrom(start)) {
                 if(isPawnPromotion(start, end)) {
-                    const std::vector<char> promoteable = {'r','b','n','q'};
-                    for(char type : promoteable) {
+                    const std::vector<PieceType> promoteable = {PieceType::Rook, PieceType::Bishop, PieceType::Knight, PieceType::Queen};
+                    for(PieceType type : promoteable) {
                         std::shared_ptr<Game> newGame(new Chess(start, end, type, *this));
                         games.push_back(newGame);
                     }
@@ -214,23 +210,26 @@ bool Chess::moveValid(ChessPosition start, ChessPosition end) {
 std::vector<ChessPosition> Chess::everyOpenMoveFrom(ChessPosition start) {
     std::vector<ChessPosition> positions;
     switch(piece(start).getType()) {
-        case 'p':
+        case PieceType::Pawn:
             positions = pawnMoves(start);
             break;
-        case 'r':
+        case PieceType::Rook:
             positions = rookMoves(start);
             break;
-        case 'b':
+        case PieceType::Bishop:
             positions = bishopMoves(start);
             break;
-        case 'q':
+        case PieceType::Queen:
             positions = queenMoves(start);
             break;
-        case 'n':
+        case PieceType::Knight:
             positions = knightMoves(start);
             break;
-        case 'k':
+        case PieceType::King:
             positions = kingMoves(start);
+            break;
+        default:
+            throw "Must move from a starting place with a piece";
             break;
     }
     return positions;
@@ -241,7 +240,7 @@ void Chess::pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positi
     const std::vector<ChessPosition> captureChecks = {ChessPosition(1, yDirection), ChessPosition(-1, yDirection)};
     for(ChessPosition offset : captureChecks) {
         ChessPosition position{start + offset};
-        if(position.onBoard() && !piece(position).isNull() && piece(position).getPlayer() != piece(start).getPlayer()) {
+        if(position.onBoard() && !piece(position).isEmpty() && piece(position).getPlayer() != piece(start).getPlayer()) {
             positions.push_back(position);
         }
     }
@@ -249,8 +248,8 @@ void Chess::pawnCaptures(ChessPosition start, std::vector<ChessPosition>& positi
 
 bool Chess::enPassant(ChessPosition start, ChessPosition end) {
     int yDirection = pawnDirection(piece(start).getPlayer());
-    bool valid = piece(start).getType() == 'p';
-    valid = valid && piece(end).enPassant() && piece(end).getPlayer() != piece(start).getPlayer();
+    bool valid = piece(start).getType() == PieceType::Pawn;
+    valid = valid && piece(end).getType() == PieceType::EnPassant && piece(end).getPlayer() != piece(start).getPlayer();
     valid = valid && start.y + yDirection == end.y && std::abs(start.x - end.x) == 1;
     valid = valid && end.onBoard();
     return valid;
@@ -277,7 +276,7 @@ std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
     ChessPosition doubleMove{ start + (ChessPosition(0, yDirection) * 2) };
 
     const bool standardClear { 
-        standardMove.onBoard() && piece(standardMove).isNull() 
+        standardMove.onBoard() && piece(standardMove).isEmpty() 
     };
 
     if(standardClear) {
@@ -286,7 +285,7 @@ std::vector<ChessPosition> Chess::pawnMoves(ChessPosition start) {
 
     const bool doubleClear { 
         standardClear && doubleMove.onBoard() && 
-        piece(doubleMove).isNull() && !piece(start).hasMoved() 
+        piece(doubleMove).isEmpty() && !piece(start).hasMoved() 
     };
 
     if(doubleClear) {
@@ -305,8 +304,8 @@ std::vector<ChessPosition> Chess::searchAlongVectors(ChessPosition start, std::v
     for(auto vector : searchVectors) {
         bool reachedEnd { false };
         for(ChessPosition position = start + vector; !reachedEnd; position += vector) {
-            reachedEnd = !position.onBoard() || !this->piece(position).isNull(); 
-            if(position.onBoard() && (piece(position).isNull() || piece(position).getPlayer() != piece(start).getPlayer())) {
+            reachedEnd = !position.onBoard() || !this->piece(position).isEmpty(); 
+            if(position.onBoard() && (piece(position).isEmpty() || piece(position).getPlayer() != piece(start).getPlayer())) {
                 positions.push_back(position);
             }
         }
@@ -318,7 +317,7 @@ std::vector<ChessPosition> Chess::checkIndividualOffsets(ChessPosition start, st
     std::vector<ChessPosition> positions;
     for(auto offset : offsets) {
         ChessPosition position = start + offset;
-        if(position.onBoard() && (piece(position).isNull() || piece(position).getPlayer() != piece(start).getPlayer())) {
+        if(position.onBoard() && (piece(position).isEmpty() || piece(position).getPlayer() != piece(start).getPlayer())) {
             positions.push_back(position);
         }
     }
@@ -365,7 +364,7 @@ std::vector<ChessPosition> Chess::knightMoves(ChessPosition start) {
 
 bool Chess::isCastleAttempt(ChessPosition start, ChessPosition end) {
     bool valid = start.onBoard() && end.onBoard();
-    valid = valid && piece(start).getType() == 'k' && !piece(start).hasMoved();
+    valid = valid && piece(start).getType() == PieceType::King && !piece(start).hasMoved();
     valid = valid && std::abs(start.x - end.x) == 2;
     if(valid) {
         ChessPosition rookPosition(0, 0);
@@ -379,12 +378,12 @@ bool Chess::isCastleAttempt(ChessPosition start, ChessPosition end) {
         }
 
         ChessPosition rookDirection = kingDirection * -1;
-        valid = valid && !piece(rookPosition).isNull() && piece(rookPosition).getType() == 'r' && !piece(rookPosition).hasMoved();
+        valid = valid && !piece(rookPosition).isEmpty() && piece(rookPosition).getType() == PieceType::Rook && !piece(rookPosition).hasMoved();
         for(ChessPosition pos = start + kingDirection; pos != end && valid; pos += kingDirection) {
-            valid = valid && piece(pos).isNull();
+            valid = valid && piece(pos).isEmpty();
         }
         for(ChessPosition pos = rookPosition + rookDirection; pos != end + rookDirection && valid; pos += rookDirection) {
-            valid = valid && piece(pos).isNull();
+            valid = valid && piece(pos).isEmpty();
         }
     }
     return valid;
@@ -411,15 +410,15 @@ std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
     return moves;
 }
 
-bool Chess::inCheck(int player) {
+bool Chess::inCheck(Player player) {
     bool check { false };
     for(int y = 0 ; y < boardSize && !check; y++) {
         for(int x = 0; x < boardSize && !check; x++) {
-            if(!piece({x, y}).isNull() && piece({x, y}).getPlayer() != player) {
+            if(!piece({x, y}).isEmpty() && piece({x, y}).getPlayer() != player) {
                 std::vector<ChessPosition> threatened = everyOpenMoveFrom({x, y});
                 check = check || std::any_of(threatened.begin(), threatened.end(), [this, player](ChessPosition position) {
                     return this->piece(position).getPlayer() == player && 
-                            this->piece(position).getType() == 'k';
+                            this->piece(position).getType() == PieceType::King;
                 });
             }
         }
@@ -466,28 +465,28 @@ EndState Chess::endState() {
     return state;
 }
 
-double Chess::scorePieces(int player) {
-    const std::map<char, int> values = {
-        {'p', 1}, {'n', 3}, {'b', 3}, {'r', 5}, {'q', 9}
+double Chess::scorePieces(Player player) {
+    const std::map<PieceType, int> values = {
+        {PieceType::Pawn, 1}, {PieceType::Knight, 3}, {PieceType::Bishop, 3}, {PieceType::Rook, 5}, {PieceType::Queen, 9}
     };
 
-    std::map<int, int> pieceTotals {
-        {0, 0}, {1, 0}
+    std::map<Player, int> pieceTotals {
+        {Player::White, 0}, {Player::Black, 0}
     };
 
     for(auto row : board) {
         for(auto piece : row) {
-            if(!piece.isNull() && piece.getType() != 'k') {
+            if(!piece.isEmpty() && piece.getType() != PieceType::King) {
                 pieceTotals[piece.getPlayer()] += values.at(piece.getType());
             }
         }
     }
 
-    int totalScore = pieceTotals[0] + pieceTotals[1];
+    int totalScore = pieceTotals[Player::White] + pieceTotals[Player::Black];
     return static_cast<double>(pieceTotals[player]) / static_cast<double>(totalScore);
 }
 
-double Chess::getScore(int player) {
+double Chess::getScore(Player player) {
     auto end = endState();
     double score;
     if(end.condition == "") {

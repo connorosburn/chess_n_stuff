@@ -2,7 +2,7 @@
 #include <random>
 #include <iostream>
 
-std::shared_ptr<Game> AI(Game* rootGame, int searchDepth) {
+std::shared_ptr<Game> AI(std::shared_ptr<Game> rootGame, int searchDepth) {
     double score {0};
     auto games = rootGame->everyHypotheticalGame();
     auto rd = std::random_device {}; 
