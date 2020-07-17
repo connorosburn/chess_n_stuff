@@ -68,6 +68,10 @@
     background-color: #bf00ff;
 }
 
+.changed-tile, .changed-tile:hover {
+    background-color: #0000ff;
+}
+
 .white, .white:hover {
     color: white;
 }

@@ -34,6 +34,7 @@ function UserInterface(props) {
             let data = await response.json();
             config.snapshot = data.snapshot;
         }
+        config.gameType = gameType;
         setActiveGameConfig(config);
         setResetGame(true);
         setDisplayMode('active-game');

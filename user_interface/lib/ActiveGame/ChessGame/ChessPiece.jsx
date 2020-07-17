@@ -4,22 +4,22 @@ function ChessPiece(props) {
     const pieceCharacters = (type) => {
         let character = '';
         switch(type) {
-            case 'r':
+            case 'rook':
                 character = '\u265C\uFE0E';
                 break;
-            case 'n':
+            case 'knight':
                 character = '\u265E\uFE0E';
                 break;
-            case 'b':
+            case 'bishop':
                 character = '\u265D\uFE0E';
                 break;
-            case 'q':
+            case 'queen':
                 character = '\u265B\uFE0E';
                 break;
-            case 'k':
+            case 'king':
                 character = '\u265A\uFE0E';
                 break;
-            case 'p':
+            case 'pawn':
                 character = '\u265F\uFE0E'; 
                 break;
             default: 

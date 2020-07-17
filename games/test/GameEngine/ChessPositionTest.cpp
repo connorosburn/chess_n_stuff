@@ -1,5 +1,5 @@
 #include "../catch.hpp"
-#include "../../lib/GameEngine/ChessPosition.hpp"
+#include "../../lib/GameEngines/Chess/ChessPosition.hpp"
 
 TEST_CASE("It initializes from notation string") {
     ChessPosition position("a2");

@@ -1,33 +1,24 @@
 import React from 'react';
+import pieceCharacter from './pieceCharacter';
 
 function PawnPromotionMenu(props) {
+    const displayPromotionButton = (type) => {
+        return (
+            <button 
+                className="promotion-tile"
+                onClick={() => props.promote(type)}
+            >
+                {pieceCharacter(type)}
+            </button>
+        );
+    }
     return(
         <div>
             <p>Choose type to promote pawn to</p>
-            <button 
-                className="promotion-tile"
-                onClick={() => props.promote('r')}
-            >
-                {'\u265C'}
-            </button>
-            <button
-                className="promotion-tile"
-                onClick={() => props.promote('n')}
-            >
-                {'\u265E'}
-            </button>
-            <button 
-                className="promotion-tile"
-                onClick={() => props.promote('b')}
-            >
-                {'\u265D'}
-            </button>
-            <button 
-                className="promotion-tile"
-                onClick={() => props.promote('q')}
-            >
-                {'\u265B'}
-            </button>
+            {displayPromotionButton('rook')}
+            {displayPromotionButton('knight')}
+            {displayPromotionButton('bishop')}
+            {displayPromotionButton('queen')}
             <button
                 className="promotion-tile"
                 onClick={props.cancel}
