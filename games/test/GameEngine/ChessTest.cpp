@@ -257,3 +257,15 @@ TEST_CASE("It follows castling rules") {
     REQUIRE(chess.getPiece("d8").getPlayer() == Player::Black);
 }
 
+TEST_CASE("It serializes and deserializes properly") {
+    Chess original;
+    Chess copy(original.getSnapshot());
+
+    for(int x = 0; x < boardSize; x++) {
+        for(int y = 0; y < boardSize; y++) {
+            REQUIRE(original.getPiece(x, y).getType() == copy.getPiece(x, y).getType());
+            REQUIRE(original.getPiece(x, y).getPlayer() == copy.getPiece(x, y).getPlayer());
+        }
+    }
+}
+

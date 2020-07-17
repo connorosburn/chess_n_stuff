@@ -13,31 +13,25 @@ const actions = {
     },
 
     move: (data) => {
-        Module.move(data.move);
+        Module.move(JSON.stringify(data.move));
     }
 };
 
 const formulateResponse = () => {
     let response = {
-        snapshot: Module.getSnapshot(),
+        snapshot: JSON.parse(Module.getSnapshot()),
         playerTurn: Module.playerTurn()
     };
+
+    if(Module.playerTurn() == config.player || !config.hasOwnProperty('player')) {
+        response.legalMoves = JSON.parse(Module.everyLegalMove());
+    }
 
 
     const endState = Module.endState();
 
-    if(endState.condition != "") {
-        if(endState.winner == 'null') {
-            response.endState = {
-                condition: endState.condition,
-                winner: null
-            };
-        } else {
-            response.endState = {
-                condition: endState.condition,
-                winner: endState.winner
-            };
-        }
+    if(endState != '') {
+        response.endState = JSON.parse(endState);
     }
     return response;
 }

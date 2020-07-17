@@ -10,7 +10,7 @@ bool move(std::string gameMove) {
     return game->move(gameMove);
 }
 
-EndState endState() {
+std::string endState() {
     return game->endState();
 }
 
@@ -19,7 +19,7 @@ void aiMove() {
 }
 
 std::string playerTurn() {
-    return playerString(game->playerTurn());
+    return Game::playerString.at(game->playerTurn());
 }
 
 void newGame(std::string gameType) {
@@ -38,11 +38,11 @@ std::string getSnapshot() {
     return game->getSnapshot();
 }
 
+std::string everyLegalMove() {
+    return game->everyLegalMove();
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
-    emscripten::value_object<EndState>("EndState")
-        .field("winner", &EndState::winner)
-        .field("condition", &EndState::condition)
-        ;
     emscripten::function("move", &move);
     emscripten::function("endState", &endState);
     emscripten::function("aiMove", &aiMove);
@@ -50,4 +50,5 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("newGame", &newGame);
     emscripten::function("fromSnapshot", &fromSnapshot);
     emscripten::function("getSnapshot", &getSnapshot);
+    emscripten::function("everyLegalMove", &everyLegalMove);
 }

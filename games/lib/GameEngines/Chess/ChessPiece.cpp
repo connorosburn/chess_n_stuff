@@ -14,44 +14,15 @@ ChessPiece::ChessPiece(): type(PieceType::Null), player(Player::Null) {
 
 ChessPiece::ChessPiece(nlohmann::json j):
 type(typeFromString(j["type"])), 
-player(playerFromString(j["player"])),
+player(Game::playerFromString(j["player"])),
 moved(j["moved"]) {
 
 }
 
-std::string typeString(PieceType type) {
-    switch(type) {
-        case PieceType::Pawn:
-            return "pawn";
-            break;
-        case PieceType::Rook:
-            return "rook";
-            break;
-        case PieceType::Knight:
-            return "knight";
-            break;
-        case PieceType::Queen:
-            return "queen";
-            break;
-        case PieceType::King:
-            return "king";
-            break;
-        case PieceType::Bishop:
-            return "bishop";
-            break;
-        case PieceType::EnPassant:
-            return "en-passant";
-            break;
-        case PieceType::Null:
-            return "null";
-            break;
-    }
-}
-
 nlohmann::json ChessPiece::serialize() {
     nlohmann::json jsonPiece;
-    jsonPiece["type"] = typeString(type);
-    jsonPiece["player"] = playerString(player);
+    jsonPiece["type"] = ChessPiece::typeString.at(type);
+    jsonPiece["player"] = Game::playerString.at(player);
     jsonPiece["moved"] = moved;
     return jsonPiece;
 }
@@ -76,22 +47,23 @@ void ChessPiece::move() {
     moved = true;
 }
 
-PieceType ChessPiece::typeFromString(std::string typeString) {
-    if(typeString == "pawn") {
-        return PieceType::Pawn;
-    } else if(typeString == "rook") {
-        return PieceType::Rook;
-    } else if(typeString == "knight") {
-        return PieceType::Knight;
-    } else if(typeString == "bishop") {
-        return PieceType::Bishop;
-    } else if(typeString == "queen") {
-        return PieceType::Queen;
-    } else if(typeString == "king") {
-        return PieceType::King;
-    } else if(typeString == "en-passant") {
-        return PieceType::EnPassant;
-    } else {
-        return PieceType::Null;
+const std::map<PieceType, std::string> ChessPiece::typeString {
+    {PieceType::Pawn, "pawn"},
+    {PieceType::Rook, "rook"},
+    {PieceType::Knight, "knight"},
+    {PieceType::Queen, "queen"},
+    {PieceType::King, "king"},
+    {PieceType::Bishop, "bishop"},
+    {PieceType::EnPassant, "en-passant"},
+    {PieceType::Null, "null"}
+};
+
+PieceType ChessPiece::typeFromString(std::string rawType) {
+    PieceType matchedType { PieceType::Null };
+    for(const auto& [type, raw] : typeString) {
+        if(raw == rawType) {
+            matchedType = type;
+        }
     }
+    return matchedType;
 }

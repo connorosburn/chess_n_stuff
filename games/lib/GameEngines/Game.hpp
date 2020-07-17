@@ -1,20 +1,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 #include <string>
+#include <map>
 
 enum class Player {White, Black, Null};
-std::string playerString(Player player);
-Player playerFromString(std::string player);
-
-struct EndState {
-    EndState(std::string endCondition, Player gameWinner);
-    EndState(std::string endCondition):
-        EndState(endCondition, Player::Null) {};
-    EndState():
-        EndState("", Player::Null) {};
-    std::string condition;
-    Player winner;
-};
 
 class Game {
     public:
@@ -25,7 +14,10 @@ class Game {
         Player otherPlayer();
         virtual std::string getSnapshot() = 0;
         virtual bool move(std::string gameMove) = 0;
-        virtual EndState endState() = 0;
+        virtual std::string everyLegalMove() = 0;
+        virtual std::string endState() = 0;
+        static const std::map<Player, std::string> playerString;
+        static Player playerFromString(std::string rawPlayer);
 };
 
 #endif

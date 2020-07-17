@@ -157,7 +157,6 @@ bool Chess::move(ChessPosition start, ChessPosition end, PieceType pieceType) {
 bool Chess::move(std::string chessMove) {
     using namespace nlohmann;
     json j = json::parse(chessMove);
-    turnCount = j["turnCount"];
     ChessPosition start(j["start"]["x"], j["start"]["y"]);
     ChessPosition end(j["end"]["x"], j["end"]["y"]);
     if(j.contains("pawnPromotion")) {
@@ -176,6 +175,27 @@ std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
         }), moves.end());
     }
     return moves;
+}
+
+std::string Chess::everyLegalMove() {
+    using namespace nlohmann;
+    json jsonMoves = json::array();
+    for(int y = 0; y < boardSize; y++) {
+        for(int x = 0; x < boardSize; x++) {
+            ChessPosition start(x, y);
+            for(ChessPosition end : everyLegalMoveFrom(start)) {
+                json jsonMove;
+                jsonMove["start"] = json();
+                jsonMove["start"]["x"] = start.x;
+                jsonMove["start"]["y"] = start.y;
+                jsonMove["end"] = json();
+                jsonMove["end"]["x"] = end.x;
+                jsonMove["end"]["y"] = end.y;
+                jsonMoves.push_back(jsonMove);
+            }
+        }
+    }
+    return jsonMoves.dump();
 }
 
 std::vector<std::shared_ptr<Game>> Chess::everyHypotheticalGame() {
@@ -453,21 +473,32 @@ bool Chess::playerStuck() {
 }
 
 
-EndState Chess::endState() {
-    EndState state;
+std::string Chess::endState() {
+    using namespace nlohmann;
+    std::string state;
     const bool stuck = playerStuck();
     const bool check = inCheck(playerTurn());
     if(stuck && check) {
-        state = EndState("checkmate", otherPlayer());
+        json j;
+        j["condition"] = "checkmate";
+        j["winner"] = playerString.at(otherPlayer());
+        state = j.dump();
     } else if(stuck && !check) {
-        state = EndState("stalemate");
+        json j;
+        j["condition"] = "stalemate";
+        state = j.dump();
     }
     return state;
 }
 
 double Chess::scorePieces(Player player) {
     const std::map<PieceType, int> values = {
-        {PieceType::Pawn, 1}, {PieceType::Knight, 3}, {PieceType::Bishop, 3}, {PieceType::Rook, 5}, {PieceType::Queen, 9}
+        {PieceType::Pawn, 1}, 
+        {PieceType::Knight, 3}, 
+        {PieceType::Bishop, 3}, 
+        {PieceType::Rook, 5}, 
+        {PieceType::Queen, 9},
+        {PieceType::King, 20}
     };
 
     std::map<Player, int> pieceTotals {
@@ -476,7 +507,7 @@ double Chess::scorePieces(Player player) {
 
     for(auto row : board) {
         for(auto piece : row) {
-            if(!piece.isEmpty() && piece.getType() != PieceType::King) {
+            if(!piece.isEmpty()) {
                 pieceTotals[piece.getPlayer()] += values.at(piece.getType());
             }
         }
@@ -487,16 +518,20 @@ double Chess::scorePieces(Player player) {
 }
 
 double Chess::getScore(Player player) {
-    auto end = endState();
+    using namespace nlohmann;
+    std::string rawEnd = endState();
     double score;
-    if(end.condition == "") {
+    if(rawEnd == "") {
         score = scorePieces(player);
-    } else if(end.condition == "checkmate" && player == end.winner) {
-        score = 1;
-    } else if(end.condition == "checkmate" && player != end.winner) {
-        score = 0;
     } else {
-        score = 0.5;
+        json end = json::parse(rawEnd);
+        if(end["condition"] == "checkmate" && playerString.at(player) == end["winner"]) {
+            score = 1;
+        } else if(end["condition"] == "checkmate" && playerString.at(player) != end["winnder"]) {
+            score = 0;
+        } else {
+            score = 0.5;
+        }
     }
     return score;
 }

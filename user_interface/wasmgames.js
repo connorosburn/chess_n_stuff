@@ -714,8 +714,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 116,
-  'maximum': 116 + 0,
+  'initial': 113,
+  'maximum': 113 + 0,
   'element': 'anyfunc'
 });
 
@@ -1336,11 +1336,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5260320,
+    STACK_BASE = 5260448,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 17440,
-    DYNAMIC_BASE = 5260320,
-    DYNAMICTOP_PTR = 17280;
+    STACK_MAX = 17568,
+    DYNAMIC_BASE = 5260448,
+    DYNAMICTOP_PTR = 17408;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1922,7 +1922,7 @@ var ASM_CONSTS = {
 
 
 
-// STATICTOP = STATIC_BASE + 16416;
+// STATICTOP = STATIC_BASE + 16544;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4444,18 +4444,32 @@ var ASM_CONSTS = {
   }
 
   
-  var structRegistrations={};
-  
-  function runDestructors(destructors) {
-      while (destructors.length) {
-          var ptr = destructors.pop();
-          var del = destructors.pop();
-          del(ptr);
+  function getShiftFromSize(size) {
+      switch (size) {
+          case 1: return 0;
+          case 2: return 1;
+          case 4: return 2;
+          case 8: return 3;
+          default:
+              throw new TypeError('Unknown type size: ' + size);
       }
     }
   
-  function simpleReadValueFromPointer(pointer) {
-      return this['fromWireType'](HEAPU32[pointer >> 2]);
+  
+  
+  function embind_init_charCodes() {
+      var codes = new Array(256);
+      for (var i = 0; i < 256; ++i) {
+          codes[i] = String.fromCharCode(i);
+      }
+      embind_charCodes = codes;
+    }var embind_charCodes=undefined;function readLatin1String(ptr) {
+      var ret = "";
+      var c = ptr;
+      while (HEAPU8[c]) {
+          ret += embind_charCodes[HEAPU8[c++]];
+      }
+      return ret;
     }
   
   
@@ -4515,7 +4529,13 @@ var ASM_CONSTS = {
       };
   
       return errorClass;
-    }var InternalError=undefined;function throwInternalError(message) {
+    }var BindingError=undefined;function throwBindingError(message) {
+      throw new BindingError(message);
+    }
+  
+  
+  
+  var InternalError=undefined;function throwInternalError(message) {
       throw new InternalError(message);
     }function whenDependentTypesAreResolved(myTypes, dependentTypes, getTypeConverters) {
       myTypes.forEach(function(type) {
@@ -4555,105 +4575,6 @@ var ASM_CONSTS = {
       if (0 === unregisteredTypes.length) {
           onComplete(typeConverters);
       }
-    }function __embind_finalize_value_object(structType) {
-      var reg = structRegistrations[structType];
-      delete structRegistrations[structType];
-  
-      var rawConstructor = reg.rawConstructor;
-      var rawDestructor = reg.rawDestructor;
-      var fieldRecords = reg.fields;
-      var fieldTypes = fieldRecords.map(function(field) { return field.getterReturnType; }).
-                concat(fieldRecords.map(function(field) { return field.setterArgumentType; }));
-      whenDependentTypesAreResolved([structType], fieldTypes, function(fieldTypes) {
-          var fields = {};
-          fieldRecords.forEach(function(field, i) {
-              var fieldName = field.fieldName;
-              var getterReturnType = fieldTypes[i];
-              var getter = field.getter;
-              var getterContext = field.getterContext;
-              var setterArgumentType = fieldTypes[i + fieldRecords.length];
-              var setter = field.setter;
-              var setterContext = field.setterContext;
-              fields[fieldName] = {
-                  read: function(ptr) {
-                      return getterReturnType['fromWireType'](
-                          getter(getterContext, ptr));
-                  },
-                  write: function(ptr, o) {
-                      var destructors = [];
-                      setter(setterContext, ptr, setterArgumentType['toWireType'](destructors, o));
-                      runDestructors(destructors);
-                  }
-              };
-          });
-  
-          return [{
-              name: reg.name,
-              'fromWireType': function(ptr) {
-                  var rv = {};
-                  for (var i in fields) {
-                      rv[i] = fields[i].read(ptr);
-                  }
-                  rawDestructor(ptr);
-                  return rv;
-              },
-              'toWireType': function(destructors, o) {
-                  // todo: Here we have an opportunity for -O3 level "unsafe" optimizations:
-                  // assume all fields are present without checking.
-                  for (var fieldName in fields) {
-                      if (!(fieldName in o)) {
-                          throw new TypeError('Missing field');
-                      }
-                  }
-                  var ptr = rawConstructor();
-                  for (fieldName in fields) {
-                      fields[fieldName].write(ptr, o[fieldName]);
-                  }
-                  if (destructors !== null) {
-                      destructors.push(rawDestructor, ptr);
-                  }
-                  return ptr;
-              },
-              'argPackAdvance': 8,
-              'readValueFromPointer': simpleReadValueFromPointer,
-              destructorFunction: rawDestructor,
-          }];
-      });
-    }
-
-  
-  function getShiftFromSize(size) {
-      switch (size) {
-          case 1: return 0;
-          case 2: return 1;
-          case 4: return 2;
-          case 8: return 3;
-          default:
-              throw new TypeError('Unknown type size: ' + size);
-      }
-    }
-  
-  
-  
-  function embind_init_charCodes() {
-      var codes = new Array(256);
-      for (var i = 0; i < 256; ++i) {
-          codes[i] = String.fromCharCode(i);
-      }
-      embind_charCodes = codes;
-    }var embind_charCodes=undefined;function readLatin1String(ptr) {
-      var ret = "";
-      var c = ptr;
-      while (HEAPU8[c]) {
-          ret += embind_charCodes[HEAPU8[c++]];
-      }
-      return ret;
-    }
-  
-  
-  
-  var BindingError=undefined;function throwBindingError(message) {
-      throw new BindingError(message);
     }/** @param {Object=} options */
   function registerType(rawType, registeredInstance, options) {
       options = options || {};
@@ -4766,6 +4687,10 @@ var ASM_CONSTS = {
           return handle;
           }
         }
+    }
+  
+  function simpleReadValueFromPointer(pointer) {
+      return this['fromWireType'](HEAPU32[pointer >> 2]);
     }function __embind_register_emval(rawType, name) {
       name = readLatin1String(name);
       registerType(rawType, {
@@ -4856,6 +4781,14 @@ var ASM_CONSTS = {
   
       var r = constructor.apply(obj, argumentList);
       return (r instanceof Object) ? r : obj;
+    }
+  
+  function runDestructors(destructors) {
+      while (destructors.length) {
+          var ptr = destructors.pop();
+          var del = destructors.pop();
+          del(ptr);
+      }
     }function craftInvokerFunction(humanName, argTypes, classType, cppInvokerFunc, cppTargetFunc) {
       // humanName: a human-readable string name for the function to be generated.
       // argTypes: An array that contains the embind type objects for all types in the function signature.
@@ -5365,45 +5298,6 @@ var ASM_CONSTS = {
       });
     }
 
-  function __embind_register_value_object(
-      rawType,
-      name,
-      constructorSignature,
-      rawConstructor,
-      destructorSignature,
-      rawDestructor
-    ) {
-      structRegistrations[rawType] = {
-          name: readLatin1String(name),
-          rawConstructor: embind__requireFunction(constructorSignature, rawConstructor),
-          rawDestructor: embind__requireFunction(destructorSignature, rawDestructor),
-          fields: [],
-      };
-    }
-
-  function __embind_register_value_object_field(
-      structType,
-      fieldName,
-      getterReturnType,
-      getterSignature,
-      getter,
-      getterContext,
-      setterArgumentType,
-      setterSignature,
-      setter,
-      setterContext
-    ) {
-      structRegistrations[structType].fields.push({
-          fieldName: readLatin1String(fieldName),
-          getterReturnType: getterReturnType,
-          getter: embind__requireFunction(getterSignature, getter),
-          getterContext: getterContext,
-          setterArgumentType: setterArgumentType,
-          setter: embind__requireFunction(setterSignature, setter),
-          setterContext: setterContext,
-      });
-    }
-
   function __embind_register_void(rawType, name) {
       name = readLatin1String(name);
       registerType(rawType, {
@@ -5427,7 +5321,7 @@ var ASM_CONSTS = {
   var _abs=Math_abs;
 
   function _emscripten_get_sbrk_ptr() {
-      return 17280;
+      return 17408;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -5593,9 +5487,9 @@ var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
   });
   FS.FSNode = FSNode;
   FS.staticInit();;
-InternalError = Module['InternalError'] = extendError(Error, 'InternalError');;
 embind_init_charCodes();
 BindingError = Module['BindingError'] = extendError(Error, 'BindingError');;
+InternalError = Module['InternalError'] = extendError(Error, 'InternalError');;
 init_emval();;
 UnboundTypeError = Module['UnboundTypeError'] = extendError(Error, 'UnboundTypeError');;
 var ASSERTIONS = true;
@@ -5632,7 +5526,7 @@ function intArrayToString(array) {
 
 
 var asmGlobalArg = {};
-var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__sys_open": ___sys_open, "__sys_read": ___sys_read, "_embind_finalize_value_object": __embind_finalize_value_object, "_embind_register_bool": __embind_register_bool, "_embind_register_emval": __embind_register_emval, "_embind_register_float": __embind_register_float, "_embind_register_function": __embind_register_function, "_embind_register_integer": __embind_register_integer, "_embind_register_memory_view": __embind_register_memory_view, "_embind_register_std_string": __embind_register_std_string, "_embind_register_std_wstring": __embind_register_std_wstring, "_embind_register_value_object": __embind_register_value_object, "_embind_register_value_object_field": __embind_register_value_object_field, "_embind_register_void": __embind_register_void, "abort": _abort, "abs": _abs, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "fd_close": _fd_close, "fd_seek": _fd_seek, "fd_write": _fd_write, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable };
+var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__sys_open": ___sys_open, "__sys_read": ___sys_read, "_embind_register_bool": __embind_register_bool, "_embind_register_emval": __embind_register_emval, "_embind_register_float": __embind_register_float, "_embind_register_function": __embind_register_function, "_embind_register_integer": __embind_register_integer, "_embind_register_memory_view": __embind_register_memory_view, "_embind_register_std_string": __embind_register_std_string, "_embind_register_std_wstring": __embind_register_std_wstring, "_embind_register_void": __embind_register_void, "abort": _abort, "abs": _abs, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "fd_close": _fd_close, "fd_seek": _fd_seek, "fd_write": _fd_write, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable };
 var asm = createWasm();
 Module["asm"] = asm;
 /** @type {function(...*):?} */
@@ -5787,13 +5681,6 @@ var dynCall_iiii = Module["dynCall_iiii"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_iiii"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_i = Module["dynCall_i"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_i"].apply(null, arguments)
 };
 
 /** @type {function(...*):?} */

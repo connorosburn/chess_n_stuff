@@ -1,203 +1,119 @@
 import React, { useState, useEffect } from 'react';
-import ChessPiece from './ChessPiece.jsx';
 import EndReport from './EndReport.jsx';
 import PawnPromotionMenu from './PawnPromotionMenu.jsx';
 import {sendMove} from '../../request/fetch';
+import ChessGrid from './ChessGrid.jsx';
 
 function ChessGame(props) {
-    const[selectedTile, setSelectedTile] = useState(null);
-    const[selectableTiles, setSelectableTiles] = useState(null);
-    const[renderBoard, setRenderBoard] = useState(null);
-    const[endState, setEndState] = useState(null);
-    const[displayMode, setDisplayMode] = useState("chess-grid");
-    const[pawnPromotionCandidate, setPawnPromotionCandidate] = useState(null);
-    const[playerTurn, setPlayerTurn] = useState(null);
-    const[newGame, setNewGame] = useState(false);
-    const[inverted, setInverted] = useState(false);
+    const [displayMode, setDisplayMode] = useState(null);
+    const [renderBoard, setRenderBoard] = useState(null);
+    const [changedTiles, setChangedTiles] = useState(null);
+    const [legalMoves, setLegalMoves] = useState(null);
+    const [inverted, setInverted] = useState(false);
+    const [pendingMove, setPendingMove] = useState(null);
+    const [endState, setEndState] = useState(null);
 
     useEffect(() => {
-        if(props.config.listener) {
-            const buffer = props.config.listener.clearBuffer();
-            buffer.forEach((e) => {
-                websocketListener(e);
-            });
-            props.config.listener.setCustomListener(websocketListener)
+        let board = props.gameData.snapshot.board;
+        if(inverted && renderBoard) {
+            const realBoard = invertBoard(renderBoard);
+            diffTiles(board, realBoard);
+            setRenderBoard(invertBoard(board));
+        } else if(!inverted && renderBoard) {
+            diffTiles(board, renderBoard);
+            setRenderBoard(board);
+        } else if(!renderBoard) {
+            setRenderBoard(board);
         }
-        if(props.resetGame()) {
-            let strippedConfig = props.config;
-            strippedConfig.listener = null;
-            game.postMessage({
-                action: 'resetGame',
-                config: strippedConfig
-            });
-            if(props.config.mode == 'online' && !props.config.hasOwnProperty('snapshot')) {
-                setNewGame(true);
-            }
-        } else {
-            game.postMessage({});
+        setLegalMoves(props.gameData.legalMoves);
+        if(props.gameData.hasOwnProperty('endState')) {
+            setEndState(props.gameData.endState);
         }
-        return () => {
-            if(props.config.listener) {
-                props.config.listener.setDefaultListener();
-            }
-        };
-    }, [props.config.gameID]);
+    }, [props.gameData]);
 
-    const websocketListener = (e) => {
-        const data = JSON.parse(e.data);
-        game.postMessage({
-            action: 'move',
-            start: data.start,
-            end: data.end,
-            pieceType: data.pieceType
-        });
-    }
-
-    game.onmessage = (e) => {
-        deselectTile();
-        let board = JSON.parse(e.data.snapshot).board;
-        if(inverted) {
-            board = invertBoard(board);
+    useEffect(() => {
+        if(renderBoard && !displayMode) {
+            setDisplayMode('chess-grid');
         }
-        setRenderBoard(board);
-        setPlayerTurn(e.data.playerTurn);
-        if(e.data.hasOwnProperty('endState')) {
-            setEndState(e.data.endState);
-        }
-    };
+    }, [renderBoard]);
 
-    const tileSelected = (x, y) => {
-        return selectedTile && selectedTile.x == x && selectedTile.y == y;
-    }
-
-    const tileSelectable = (x, y, piece) => {
-        let selectable = false;
-        if(selectableTiles) {
-            for(let i = 0; i < selectableTiles.length; i++) {
-                if(selectableTiles[i].x == x && selectableTiles[i].y == y) {
-                    selectable = true;
+    const diffTiles = (board, diffBoard) => {
+        let differences = [];
+        board.forEach((row, y) => {
+            row.forEach((tile, x) => {
+                let diffTile = diffBoard[y][x];
+                let newTile = tile;
+                if(diffTile.type == 'en-passant') {
+                    diffTile.type = 'null'; 
+                    diffTile.player = 'null'; 
                 }
-            }
-        } else if(!piece.null && !selectableTiles && playerTurn) {
-            selectable = (playerTurn == props.config.player || !props.config.player) && piece.legalMoves.length > 0;
-        }
-        return selectable;
-    }
-
-    const move = async (start, end, pieceType) => {
-        game.postMessage({
-            action: 'move',
-            start: start, 
-            end: end, 
-            pieceType: pieceType
+                if(newTile.type == 'en-passant') {
+                    newTile.type = 'null';
+                    newTile.player = 'null';
+                }
+                if(diffTile.type != newTile.type || diffTile.player != newTile.player) {
+                    differences.push({x: x, y: y});
+                }
+            });
         });
-
-        if(props.config.mode == 'online') {
-            const move = {
-                start: start, end: end, 
-                pieceType: pieceType
-            };
-            let response;
-            if(newGame) {
-                response = await props.startGame(move);
-            } else {
-                response = await sendMove(props.config.gameID, move);
-            }
+        if(differences.length > 0) {
+            setChangedTiles(differences);
         }
-        setNewGame(false);
     }
 
-    const promotePawn = (pieceType) => {
-        move(selectedTile, pawnPromotionCandidate, pieceType);
-        setDisplayMode("chess-grid");
+    const isPawnPromotion = (move, board) => {
+        return (
+                board[move.start.y][move.start.x].type == 'pawn' && 
+                (
+                    (move.start.y == 1 && move.end.y == 0) ||
+                    (move.start.y == 6 && move.end.y == 7)
+                )
+            );
     }
 
-    const getPiece = (x, y) => {
+    const movePiece = (move) => {
+        let realBoard = renderBoard;
         if(inverted) {
-            return renderBoard[7 - y][7 - x];
+            realBoard = invertBoard(renderBoard);
+        }
+        if(isPawnPromotion(move, realBoard)) {
+            setPendingMove(move);
+            setDisplayMode('pawn-promotion');
         } else {
-            return renderBoard[y][x];
+            props.sendMove(move);
         }
     }
 
-    const movePiece = (x, y) => {
-        const start = {
-            x: selectedTile.x,
-            y: selectedTile.y
-        };
-        const end = {
-            x: x,
-            y: y
-        }
-        const piece = getPiece(selectedTile.x, selectedTile.y);
-        if(piece.type == "p" && (y == 7 || y == 0)) {
-            setPawnPromotionCandidate(end);
-            setDisplayMode("pawn-promotion");
-        } else {
-            move(start, end)
-        }
+    const promotePawn = (type) => {
+        let move = pendingMove;
+        move.pawnPromotion = type;
+        props.sendMove(move);
+        setPendingMove(null);
+        setDisplayMode('chess-grid');
     }
 
-    const deselectTile = () => {
-        setSelectedTile(null);
-        setSelectableTiles(null);
-    }
-
-    const selectTile = (x, y, piece) => {
-        if(tileSelectable(x, y, piece)) {
-            if(piece.legalMoves.length == 0) {
-                movePiece(x, y);
-            } else {
-                setSelectedTile({x: x, y: y});
-                setSelectableTiles(piece.legalMoves);
-            }
-        }
-    }
-
-    const displayChessGrid = () => {
-        if(renderBoard) {
-            return(
-                <div className="chess-board">
-                    {renderBoard.map((row, y) => {
-                        if(inverted) {
-                            y = renderBoard.length - 1 - y;
-                        }
-                        return (
-                            row.map((piece, x) => {
-                                if(inverted) {
-                                    x = renderBoard[y].length - 1 - x;
-                                }
-                                return (
-                                    <ChessPiece
-                                        key={x}
-                                        piece={piece}
-                                        position={{x: x, y: y}}
-                                        selected={() => tileSelected(x, y)}
-                                        selectable={() => tileSelectable(x, y, piece)}
-                                        selectTile={() => selectTile(x, y, piece)}
-                                        deselectTile={deselectTile}
-                                        pieceColor={piece.player}
-                                    />
-                                )
-                            })
-                        )
-                            
-                    })}
-                </div>
-            );
-        }
-    }
-
-    const displayChessBoard = () => {
-        if(displayMode == 'chess-grid') {
-            return displayChessGrid();
-        } else if(displayMode == 'pawn-promotion') {
-            return (
-                <PawnPromotionMenu 
-                    promote={promotePawn}
-                    cancel={() => setDisplayMode('chess-grid')}
-                />
-            );
+    const displayChessGame = () => {
+        switch(displayMode) {
+            case 'chess-grid':
+                return (
+                    <ChessGrid
+                        renderBoard={renderBoard}
+                        legalMoves={legalMoves}
+                        changedTiles={changedTiles}
+                        inverted={inverted}
+                        move={movePiece}
+                    />
+                );
+            case 'pawn-promotion':
+                return (
+                    <PawnPromotionMenu
+                        promote={promotePawn}
+                        cancel={() => {
+                            setPendingMove(null);
+                            setDisplayMode('chess-grid');
+                        }}
+                    />
+                );
         }
     }
 
@@ -208,10 +124,12 @@ function ChessGame(props) {
     }
 
     const invertBoard = (board) => {
-        let invertedBoard = board.map((row) => {
-            row.reverse();
-            return row;
-        })
+        let invertedBoard = [...board]
+        invertedBoard = invertedBoard.map((row) => {
+            let revRow = [...row];
+            revRow.reverse();
+            return revRow;
+        });
         invertedBoard.reverse();
         return invertedBoard;
     }
@@ -223,7 +141,7 @@ function ChessGame(props) {
 
     return(
         <div className="chess-game">
-            {displayChessBoard()}
+            {displayChessGame()}
             <button 
                 onClick={toggleInversion}
                 className="chess-inversion-button"

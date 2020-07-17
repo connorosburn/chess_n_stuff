@@ -19,8 +19,9 @@ class ChessPiece {
         bool hasMoved();
         void move();
         bool isEmpty();
-        static PieceType typeFromString(std::string typeString);
         std::string notationString();
+        static const std::map<PieceType, std::string> typeString;
+        static PieceType typeFromString(std::string rawType);
     private:
         Player player;
         PieceType type;

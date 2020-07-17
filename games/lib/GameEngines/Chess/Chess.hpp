@@ -50,6 +50,7 @@ class Chess : public Game {
         bool inCheck(Player player);
         std::vector<std::vector<ChessPiece>> getBoard();
         std::vector<ChessPosition> everyLegalMoveFrom(ChessPosition start);
+        std::string everyLegalMove();
         std::vector<std::shared_ptr<Game>> everyHypotheticalGame();
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
@@ -60,7 +61,7 @@ class Chess : public Game {
         bool move(ChessPosition start, ChessPosition end, PieceType pieceType);
         bool move(std::string chessMove);
         bool isPawnPromotion(ChessPosition start, ChessPosition end);
-        EndState endState();
+        std::string endState();
         double getScore(Player player);
 
     private:
