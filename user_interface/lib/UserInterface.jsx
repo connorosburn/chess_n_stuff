@@ -33,6 +33,7 @@ function UserInterface(props) {
             let response = await getGame(config.gameID);
             let data = await response.json();
             config.snapshot = data.snapshot;
+            console.log(data)
         }
         config.gameType = gameType;
         setActiveGameConfig(config);
@@ -46,6 +47,7 @@ function UserInterface(props) {
                 return (
                     <OnlineGames 
                         setUpGame={setUpGame}
+                        gameType={gameType}
                     />
                 );
             case 'registration':
@@ -86,7 +88,6 @@ function UserInterface(props) {
                         setGameID={(id) => {
                             let newConfig = activeGameConfig;
                             newConfig.gameID = id;
-                            newConfig.listener = new LiveGameListener(id);
                             setActiveGameConfig(newConfig);
                         }}
                         gameType={gameType}

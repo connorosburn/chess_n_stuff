@@ -40,7 +40,7 @@ onmessage = (e) => {
     if(e.data.hasOwnProperty('action')) {
         actions[e.data.action](e.data);
     }
-
+    
     postMessage(formulateResponse());
 
     if(config.mode == 'ai' && Module.playerTurn() != config.player) {
