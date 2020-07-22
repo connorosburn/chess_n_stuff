@@ -2,6 +2,7 @@
 #define GAME_TYPE_HPP
 #include "../GameEngines/Game.hpp"
 #include "../GameEngines/Chess/Chess.hpp"
+#include "../GameEngines/TicTacToe/TicTacToe.hpp"
 
 namespace GameType {
     struct GameType {
@@ -30,8 +31,19 @@ namespace GameType {
         3
     );
 
+    const GameType TicTacToeGame(
+        []() {
+            return std::shared_ptr<Game>(new TicTacToe());
+        },
+        [](std::string snapshot) {
+            return std::shared_ptr<Game>(new TicTacToe(snapshot));
+        },
+        10
+    );
+
     const std::map<std::string, GameType> gameTypes {
-        {"chess", ChessGame}
+        {"chess", ChessGame},
+        {"tic-tac-toe", TicTacToeGame}
     };
 };
 

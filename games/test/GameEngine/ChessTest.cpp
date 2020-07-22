@@ -180,23 +180,6 @@ const std::vector<std::vector<ChessPiece>> checkMateBoard {
     }
 };
 
-TEST_CASE("It detects checkmate") {
-    Chess chess;
-
-    auto endState = chess.endState();
-
-    REQUIRE(endState.condition == "");
-    REQUIRE(endState.winner != Player::Black);
-    REQUIRE(endState.winner != Player::White);
-    
-    chess = Chess(checkMateBoard, 1);
-
-    endState = chess.endState();
-
-    REQUIRE(endState.condition == "checkmate");
-    REQUIRE(endState.winner == Player::White);
-}
-
 TEST_CASE("It follows the en passant rule") {
     Chess chess;
     REQUIRE(chess.move("b2", "b3"));
@@ -261,8 +244,8 @@ TEST_CASE("It serializes and deserializes properly") {
     Chess original;
     Chess copy(original.getSnapshot());
 
-    for(int x = 0; x < boardSize; x++) {
-        for(int y = 0; y < boardSize; y++) {
+    for(int x = 0; x < chessBoardSize; x++) {
+        for(int y = 0; y < chessBoardSize; y++) {
             REQUIRE(original.getPiece(x, y).getType() == copy.getPiece(x, y).getType());
             REQUIRE(original.getPiece(x, y).getPlayer() == copy.getPiece(x, y).getPlayer());
         }

@@ -21,12 +21,12 @@ const std::vector<std::vector<ChessPiece>> defaultBoard {
             ChessPiece(PieceType::Knight, Player::Black), 
             ChessPiece(PieceType::Rook, Player::Black)
         },
-        std::vector<ChessPiece>(boardSize, ChessPiece(PieceType::Pawn, Player::Black)),
-        std::vector<ChessPiece>(boardSize, ChessPiece()),
-        std::vector<ChessPiece>(boardSize, ChessPiece()),
-        std::vector<ChessPiece>(boardSize, ChessPiece()),
-        std::vector<ChessPiece>(boardSize, ChessPiece()),
-        std::vector<ChessPiece>(boardSize, ChessPiece(PieceType::Pawn, Player::White)),
+        std::vector<ChessPiece>(chessBoardSize, ChessPiece(PieceType::Pawn, Player::Black)),
+        std::vector<ChessPiece>(chessBoardSize, ChessPiece()),
+        std::vector<ChessPiece>(chessBoardSize, ChessPiece()),
+        std::vector<ChessPiece>(chessBoardSize, ChessPiece()),
+        std::vector<ChessPiece>(chessBoardSize, ChessPiece()),
+        std::vector<ChessPiece>(chessBoardSize, ChessPiece(PieceType::Pawn, Player::White)),
         {
             ChessPiece(PieceType::Rook, Player::White), 
             ChessPiece(PieceType::Knight, Player::White), 

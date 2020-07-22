@@ -84,8 +84,8 @@ void Chess::movePiece(ChessPosition start, ChessPosition end) {
     enPassantExceptions(start, end);
     if(isCastleAttempt(start, end)) {
         if(end.x > start.x) {
-            piece(end + ChessPosition(-1, 0)) = piece({boardSize - 1, start.y});
-            piece({boardSize - 1, start.y}) = ChessPiece();
+            piece(end + ChessPosition(-1, 0)) = piece({chessBoardSize - 1, start.y});
+            piece({chessBoardSize - 1, start.y}) = ChessPiece();
         } else if(end.x < start.x) {
             piece(end + ChessPosition(1, 0)) = piece({0, start.y});
             piece({0, start.y}) = ChessPiece();
@@ -103,7 +103,7 @@ void Chess::enPassantExceptions(ChessPosition start, ChessPosition end) {
         piece({end.x, end.y - yDirection}) = ChessPiece();
     }
 
-    for(int i = 0; i < boardSize; i++) {
+    for(int i = 0; i < chessBoardSize; i++) {
         std::vector<ChessPosition> enPassantTargets {
             { ChessPosition(i, 2), ChessPosition(i, 5) }
         };
@@ -129,7 +129,7 @@ bool Chess::move(std::string start, std::string end, PieceType pieceType) {
 }
 
 bool Chess::isPawnPromotion(ChessPosition start, ChessPosition end) {
-    return !piece(start).isEmpty() && piece(start).getType() == PieceType::Pawn && (end.y == 0 || end.y == boardSize - 1);
+    return !piece(start).isEmpty() && piece(start).getType() == PieceType::Pawn && (end.y == 0 || end.y == chessBoardSize - 1);
 }
 
 bool Chess::move(ChessPosition start, ChessPosition end) {
@@ -180,8 +180,8 @@ std::vector<ChessPosition> Chess::everyLegalMoveFrom(ChessPosition start) {
 std::string Chess::everyLegalMove() {
     using namespace nlohmann;
     json jsonMoves = json::array();
-    for(int y = 0; y < boardSize; y++) {
-        for(int x = 0; x < boardSize; x++) {
+    for(int y = 0; y < chessBoardSize; y++) {
+        for(int x = 0; x < chessBoardSize; x++) {
             ChessPosition start(x, y);
             for(ChessPosition end : everyLegalMoveFrom(start)) {
                 json jsonMove;
@@ -200,8 +200,8 @@ std::string Chess::everyLegalMove() {
 
 std::vector<std::shared_ptr<Game>> Chess::everyHypotheticalGame() {
     std::vector<std::shared_ptr<Game>> games;
-    for(int x = 0; x < boardSize; x++) {
-        for(int y = 0; y < boardSize; y++) {
+    for(int x = 0; x < chessBoardSize; x++) {
+        for(int y = 0; y < chessBoardSize; y++) {
             ChessPosition start(x, y);
             for(auto end : everyLegalMoveFrom(start)) {
                 if(isPawnPromotion(start, end)) {
@@ -390,7 +390,7 @@ bool Chess::isCastleAttempt(ChessPosition start, ChessPosition end) {
         ChessPosition rookPosition(0, 0);
         ChessPosition kingDirection(0, 0);
         if(end.x > start.x) {
-            rookPosition = ChessPosition(boardSize - 1, start.y);
+            rookPosition = ChessPosition(chessBoardSize - 1, start.y);
             kingDirection = ChessPosition(1, 0);
         } else if(end.x < start.x) {
             rookPosition = ChessPosition(0, start.y);
@@ -432,8 +432,8 @@ std::vector<ChessPosition> Chess::kingMoves(ChessPosition start) {
 
 bool Chess::inCheck(Player player) {
     bool check { false };
-    for(int y = 0 ; y < boardSize && !check; y++) {
-        for(int x = 0; x < boardSize && !check; x++) {
+    for(int y = 0 ; y < chessBoardSize && !check; y++) {
+        for(int x = 0; x < chessBoardSize && !check; x++) {
             if(!piece({x, y}).isEmpty() && piece({x, y}).getPlayer() != player) {
                 std::vector<ChessPosition> threatened = everyOpenMoveFrom({x, y});
                 check = check || std::any_of(threatened.begin(), threatened.end(), [this, player](ChessPosition position) {
@@ -464,8 +464,8 @@ bool Chess::hypotheticalCheck(ChessPosition start, ChessPosition end) {
 
 bool Chess::playerStuck() {
     bool stuck { true };
-    for(int y = 0; y < boardSize && stuck; y++) {
-        for(int x = 0; x < boardSize && stuck; x++) {
+    for(int y = 0; y < chessBoardSize && stuck; y++) {
+        for(int x = 0; x < chessBoardSize && stuck; x++) {
             stuck = stuck && everyLegalMoveFrom({x, y}).empty();
         }
     }
