@@ -28,18 +28,22 @@ double TicTacToe::getScore(Player player) {
     }
 }
 
-std::vector<std::shared_ptr<Game>> TicTacToe::everyHypotheticalGame() {
-    std::vector<std::shared_ptr<Game>> games;
-    if(endState().empty()) {
+std::vector<Game*> TicTacToe::everyHypotheticalGame() {
+    std::vector<Game*> games;
+    if(checkWinner() == Player::Null) {
         for(int y = 0; y < tttBoardSize; y++) {
             for(int x = 0; x < tttBoardSize; x++) {
                 if(board[y][x] == Player::Null) {
-                    games.emplace_back(new TicTacToe(*this, x, y));
+                    games.push_back(new TicTacToe(*this, x, y));
                 }
             }
         }
     }
     return games;
+}
+
+bool TicTacToe::over() {
+    return checkWinner() != Player::Null || boardFull();
 }
 
 int TicTacToe::getTurnCount() {
@@ -72,7 +76,7 @@ bool TicTacToe::move(std::string gameMove) {
 
 bool TicTacToe::move(int x, int y) {
     bool valid = x < tttBoardSize && x >= 0 && y < tttBoardSize && y >= 0;
-    valid = valid && board[y][x] == Player::Null && endState().empty();
+    valid = valid && board[y][x] == Player::Null && checkWinner() == Player::Null;
     if(valid) {
         board[y][x] = playerTurn();
     }
@@ -81,7 +85,7 @@ bool TicTacToe::move(int x, int y) {
 
 std::string TicTacToe::everyLegalMove() {
     nlohmann::json j = nlohmann::json::array();
-    if(endState().empty()) {
+    if(checkWinner() == Player::Null) {
         for(int y = 0; y < tttBoardSize; y++) {
             for(int x = 0; x < tttBoardSize; x++) {
                 if(board[y][x] == Player::Null) {
@@ -106,6 +110,7 @@ bool TicTacToe::boardFull() {
     return full;
 }
 
+
 nlohmann::json TicTacToe::checkVertical() {
     nlohmann::json winningVertical = nlohmann::json::array();
     for(int x = 0; x < tttBoardSize; x++) {
@@ -113,11 +118,10 @@ nlohmann::json TicTacToe::checkVertical() {
         nlohmann::json thisVertical = nlohmann::json::array();
         for(int y = 0; y < tttBoardSize; y++) {
             nlohmann::json thisTile;
-            thisTile['x'] = x;
-            thisTile['y'] = y;
+            thisTile["x"] = x;
+            thisTile["y"] = y;
             thisVertical.push_back(thisTile);
             victory = victory && board[y][x] != Player::Null && board[y][x] == board[0][x];
-
         }
         if(victory) {
             winningVertical = thisVertical;
@@ -133,8 +137,8 @@ nlohmann::json TicTacToe::checkHorizontal() {
         nlohmann::json thisHorizontal = nlohmann::json::array();
         for(int x = 0; x < tttBoardSize; x++) {
             nlohmann::json thisTile;
-            thisTile['x'] = x;
-            thisTile['y'] = y;
+            thisTile["x"] = x;
+            thisTile["y"] = y;
             thisHorizontal.push_back(thisTile);
             victory = victory && board[y][x] != Player::Null && board[y][x] == board[y][0];
 
@@ -146,26 +150,25 @@ nlohmann::json TicTacToe::checkHorizontal() {
     return winningHorizontal;
 }
 
+
 nlohmann::json TicTacToe::checkDiagonal() {
     nlohmann::json winningDiagonal = nlohmann::json::array();
     nlohmann::json forwardDiagonal = nlohmann::json::array();
     nlohmann::json backwardDiagonal = nlohmann::json::array();
     bool forwardVictory = true;
     bool backwardVictory = true;
-    for(int x = 0; x < tttBoardSize; x++) {
-        for(int y = 0; y < tttBoardSize; y++) {
-            int backX = tttBoardSize - x - 1;
-            nlohmann::json fTile;
-            nlohmann::json bTile;
-            fTile["x"] = x;
-            fTile["y"] = y;
-            bTile["x"] = backX;
-            bTile["y"] = y;
-            forwardDiagonal.push_back(fTile);
-            backwardDiagonal.push_back(bTile);
-            forwardVictory = forwardVictory && board[y][x] != Player::Null && board[y][x] == board[0][0];
-            backwardVictory = backwardVictory && board[y][backX] != Player::Null && board[y][backX] == board[0][tttBoardSize - 1];
-        }
+    for(int xy = 0; xy < tttBoardSize; xy++) {
+        int backX = tttBoardSize - xy - 1;
+        nlohmann::json fTile;
+        nlohmann::json bTile;
+        fTile["x"] = xy;
+        fTile["y"] = xy;
+        bTile["x"] = backX;
+        bTile["y"] = xy;
+        forwardDiagonal.push_back(fTile);
+        backwardDiagonal.push_back(bTile);
+        forwardVictory = forwardVictory && board[xy][xy] != Player::Null && board[xy][xy] == board[0][0];
+        backwardVictory = backwardVictory && board[xy][backX] != Player::Null && board[xy][backX] == board[0][tttBoardSize - 1];
     }
 
     if(forwardVictory) {
@@ -177,9 +180,9 @@ nlohmann::json TicTacToe::checkDiagonal() {
 }
 
 Player TicTacToe::checkWinner() {
-    std::vector<nlohmann::json> potentialWins {{checkDiagonal(), checkHorizontal(), checkVertical()}};
+    std::vector<nlohmann::json> potentialWins = {checkDiagonal(), checkHorizontal(), checkVertical()};
     Player winner = Player::Null;
-    for(auto win : potentialWins) {
+    for(nlohmann::json win : potentialWins) {
         if(!win.empty()) {
             winner = board[win[0]["y"]][win[0]["x"]];
         }
@@ -189,7 +192,7 @@ Player TicTacToe::checkWinner() {
 
 std::string TicTacToe::endState() {
     std::string state;
-    std::vector<nlohmann::json> potentialEnds { {checkVertical(), checkHorizontal(), checkDiagonal()} };
+    std::vector<nlohmann::json> potentialEnds = {checkVertical(), checkHorizontal(), checkDiagonal()};
     for(nlohmann::json j : potentialEnds) {
         if(!j.empty()) {
             nlohmann::json victoryMessage;

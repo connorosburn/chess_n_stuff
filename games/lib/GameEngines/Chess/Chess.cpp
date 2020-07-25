@@ -198,8 +198,8 @@ std::string Chess::everyLegalMove() {
     return jsonMoves.dump();
 }
 
-std::vector<std::shared_ptr<Game>> Chess::everyHypotheticalGame() {
-    std::vector<std::shared_ptr<Game>> games;
+std::vector<Game*> Chess::everyHypotheticalGame() {
+    std::vector<Game*> games;
     for(int x = 0; x < chessBoardSize; x++) {
         for(int y = 0; y < chessBoardSize; y++) {
             ChessPosition start(x, y);
@@ -207,17 +207,30 @@ std::vector<std::shared_ptr<Game>> Chess::everyHypotheticalGame() {
                 if(isPawnPromotion(start, end)) {
                     const std::vector<PieceType> promoteable = {PieceType::Rook, PieceType::Bishop, PieceType::Knight, PieceType::Queen};
                     for(PieceType type : promoteable) {
-                        std::shared_ptr<Game> newGame(new Chess(start, end, type, *this));
+                        Game* newGame { new Chess(start, end, type, *this) };
                         games.push_back(newGame);
                     }
                 } else {
-                    std::shared_ptr<Game> newGame(new Chess(start, end, *this));
+                    Game* newGame { new Chess(start, end, *this) };
                     games.push_back(newGame);
                 }
             }
         }
     }
     return games;
+}
+
+bool Chess::over() {
+    bool gameOver { true };
+    for(int x = 0; x < chessBoardSize && gameOver; x++) {
+        for(int y = 0; y < chessBoardSize; y++) {
+            ChessPosition start(x, y);
+            for(auto end : everyLegalMoveFrom(start)) {
+                gameOver = false;
+            }
+        }
+    }
+    return gameOver;
 }
 
 bool Chess::moveValid(ChessPosition start, ChessPosition end) {

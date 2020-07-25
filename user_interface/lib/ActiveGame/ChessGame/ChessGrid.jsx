@@ -108,9 +108,9 @@ function ChessGrid(props) {
                                         {pieceCharacter(piece.type)}
                                     </div>
                                 </button>
-                            )
+                            );
                         })
-                    )
+                    );
                         
                 })}
             </div>

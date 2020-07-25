@@ -27,9 +27,8 @@ const formulateResponse = () => {
         response.legalMoves = JSON.parse(Module.everyLegalMove());
     }
 
-
     const endState = Module.endState();
-
+    
     if(endState != '') {
         response.endState = JSON.parse(endState);
     }
@@ -40,7 +39,7 @@ onmessage = (e) => {
     if(e.data.hasOwnProperty('action')) {
         actions[e.data.action](e.data);
     }
-    
+
     postMessage(formulateResponse());
 
     if(config.mode == 'ai' && Module.playerTurn() != config.player) {

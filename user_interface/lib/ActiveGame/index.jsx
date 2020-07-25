@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ChessGame from './ChessGame';
+import TicTacToeGame from './TicTacToeGame';
 import {startOnlineGame, sendOnlineMove} from '../request/fetch'
 
 function ActiveGame(props) {
     const[gameData, setGameData] = useState(null);
     const[socket, setSocket] = useState(null);
+
     const sendMove = async (move) => {
         game.postMessage({
             action: 'move',
@@ -21,6 +23,7 @@ function ActiveGame(props) {
                 if(response.status == 200) {
                     let data = await response.json();
                     props.setGameID(data.id)
+                    setSocket(new WebSocket(WSURL));
                 } else {
                     props.nullifyGame();
                 }
@@ -29,7 +32,7 @@ function ActiveGame(props) {
     }
 
     useEffect(() => {
-        if(props.config.mode == 'online' && props.config.gameID && !socket) {
+        if(props.config.mode == 'online' && props.config.hasOwnProperty('gameID') && !socket) {
             setSocket(new WebSocket(WSURL));
         }
     });
@@ -40,7 +43,7 @@ function ActiveGame(props) {
                 socket.send(JSON.stringify({gameID: props.config.gameID}));
             };
         }
-    }, [socket])
+    }, [socket]);
 
     useEffect(() => {
         if(socket) {
@@ -54,7 +57,7 @@ function ActiveGame(props) {
                 }
             };
         }
-    }, [gameData]);
+    }, [gameData, props.config.gameID]);
 
     useEffect(() => {
         let workerMessage = {};
@@ -75,6 +78,13 @@ function ActiveGame(props) {
             case 'chess':
                 return (
                     <ChessGame
+                        sendMove={sendMove}
+                        gameData={gameData}
+                    />
+                );
+            case 'tic-tac-toe':
+                return (
+                    <TicTacToeGame
                         sendMove={sendMove}
                         gameData={gameData}
                     />

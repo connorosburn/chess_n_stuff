@@ -13,13 +13,15 @@ class TicTacToe : public Game {
         TicTacToe();
         TicTacToe(std::string snapshot);
         double getScore(Player player);
-        std::vector<std::shared_ptr<Game>> everyHypotheticalGame();
+        std::vector<Game*> everyHypotheticalGame();
+        bool over();
         int getTurnCount();
         std::string getSnapshot();
         bool move(std::string gameMove);
         bool move(int x, int y);
         std::string everyLegalMove();
         std::string endState();
+        Player checkWinner();
 
     private:
         TicTacToe(TicTacToe proto, int x, int y);
@@ -28,7 +30,6 @@ class TicTacToe : public Game {
         nlohmann::json checkHorizontal();
         nlohmann::json checkDiagonal();
         bool boardFull();
-        Player checkWinner();
 };
 
 #endif

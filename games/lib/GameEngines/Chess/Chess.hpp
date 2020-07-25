@@ -51,7 +51,8 @@ class Chess : public Game {
         std::vector<std::vector<ChessPiece>> getBoard();
         std::vector<ChessPosition> everyLegalMoveFrom(ChessPosition start);
         std::string everyLegalMove();
-        std::vector<std::shared_ptr<Game>> everyHypotheticalGame();
+        std::vector<Game*> everyHypotheticalGame();
+        bool over();
         ChessPiece getPiece(std::string position);
         ChessPiece getPiece(ChessPosition position);
         ChessPiece getPiece(int x, int y);
