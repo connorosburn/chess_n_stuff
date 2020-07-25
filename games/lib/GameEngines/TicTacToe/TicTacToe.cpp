@@ -110,95 +110,65 @@ bool TicTacToe::boardFull() {
     return full;
 }
 
+struct Coordinate {
+    Coordinate(int X, int Y): x(X), y(Y) {};
+    int x;
+    int y;
+};
 
-nlohmann::json TicTacToe::checkVertical() {
-    nlohmann::json winningVertical = nlohmann::json::array();
-    for(int x = 0; x < tttBoardSize; x++) {
-        bool victory = true;
-        nlohmann::json thisVertical = nlohmann::json::array();
-        for(int y = 0; y < tttBoardSize; y++) {
-            nlohmann::json thisTile;
-            thisTile["x"] = x;
-            thisTile["y"] = y;
-            thisVertical.push_back(thisTile);
-            victory = victory && board[y][x] != Player::Null && board[y][x] == board[0][x];
-        }
-        if(victory) {
-            winningVertical = thisVertical;
-        }
-    }
-    return winningVertical;
-}
-
-nlohmann::json TicTacToe::checkHorizontal() {
-    nlohmann::json winningHorizontal = nlohmann::json::array();
-    for(int y = 0; y < tttBoardSize; y++) {
-        bool victory = true;
-        nlohmann::json thisHorizontal = nlohmann::json::array();
-        for(int x = 0; x < tttBoardSize; x++) {
-            nlohmann::json thisTile;
-            thisTile["x"] = x;
-            thisTile["y"] = y;
-            thisHorizontal.push_back(thisTile);
-            victory = victory && board[y][x] != Player::Null && board[y][x] == board[y][0];
-
-        }
-        if(victory) {
-            winningHorizontal = thisHorizontal;
-        }
-    }
-    return winningHorizontal;
-}
-
-
-nlohmann::json TicTacToe::checkDiagonal() {
-    nlohmann::json winningDiagonal = nlohmann::json::array();
-    nlohmann::json forwardDiagonal = nlohmann::json::array();
-    nlohmann::json backwardDiagonal = nlohmann::json::array();
-    bool forwardVictory = true;
-    bool backwardVictory = true;
-    for(int xy = 0; xy < tttBoardSize; xy++) {
-        int backX = tttBoardSize - xy - 1;
-        nlohmann::json fTile;
-        nlohmann::json bTile;
-        fTile["x"] = xy;
-        fTile["y"] = xy;
-        bTile["x"] = backX;
-        bTile["y"] = xy;
-        forwardDiagonal.push_back(fTile);
-        backwardDiagonal.push_back(bTile);
-        forwardVictory = forwardVictory && board[xy][xy] != Player::Null && board[xy][xy] == board[0][0];
-        backwardVictory = backwardVictory && board[xy][backX] != Player::Null && board[xy][backX] == board[0][tttBoardSize - 1];
-    }
-
-    if(forwardVictory) {
-        winningDiagonal = forwardDiagonal;
-    } else if(backwardVictory) {
-        winningDiagonal = backwardDiagonal;
-    }
-    return winningDiagonal;
-}
+const std::vector<std::vector<Coordinate>> potentialWins {{
+    {Coordinate(0, 0), Coordinate(1, 0), Coordinate(2, 0)},
+    {Coordinate(0, 1), Coordinate(1, 1), Coordinate(2, 1)},
+    {Coordinate(0, 2), Coordinate(1, 2), Coordinate(2, 2)},
+    {Coordinate(0, 0), Coordinate(0, 1), Coordinate(0, 2)},
+    {Coordinate(1, 0), Coordinate(1, 1), Coordinate(1, 2)},
+    {Coordinate(2, 0), Coordinate(2, 1), Coordinate(2, 2)},
+    {Coordinate(0, 0), Coordinate(1, 1), Coordinate(2, 2)},
+    {Coordinate(2, 0), Coordinate(1, 1), Coordinate(0, 2)}
+}};
 
 Player TicTacToe::checkWinner() {
-    std::vector<nlohmann::json> potentialWins = {checkDiagonal(), checkHorizontal(), checkVertical()};
     Player winner = Player::Null;
-    for(nlohmann::json win : potentialWins) {
-        if(!win.empty()) {
-            winner = board[win[0]["y"]][win[0]["x"]];
+    for(int i = 0; i < potentialWins.size() && winner == Player::Null; i++) {
+        const std::vector<Coordinate>& win = potentialWins[i];
+        Player contender = board[win.front().y][win.front().x];
+        if(contender != Player::Null) {
+            bool victory = true;
+            for(const Coordinate& tile : win) {
+                victory = victory && board[tile.y][tile.x] == contender;
+            }
+            if(victory) {
+                winner = contender;
+            }
         }
+
     }
     return winner;
 }
 
 std::string TicTacToe::endState() {
     std::string state;
-    std::vector<nlohmann::json> potentialEnds = {checkVertical(), checkHorizontal(), checkDiagonal()};
-    for(nlohmann::json j : potentialEnds) {
-        if(!j.empty()) {
-            nlohmann::json victoryMessage;
-            victoryMessage["winner"] = playerString.at(board[j[0]["y"]][j[0]["x"]]);
-            victoryMessage["tiles"] = j;
-            state = victoryMessage.dump();
+    Player winner = Player::Null;
+    for(int i = 0; i < potentialWins.size() && winner == Player::Null; i++) {
+        const std::vector<Coordinate>& win = potentialWins[i];
+        Player contender = board[win.front().y][win.front().x];
+        if(contender != Player::Null) {
+            bool victory = true;
+            for(const Coordinate& tile : win) {
+                victory = victory && board[tile.y][tile.x] == contender;
+            }
+            if(victory) {
+                winner = contender;
+                nlohmann::json j;
+                j["winner"] = playerString.at(winner);
+                j["tiles"] = nlohmann::json::array();
+                for(const Coordinate& tile : win) {
+                    j["tiles"].push_back(nlohmann::json());
+                    j["tiles"].back()["x"] = tile.x;
+                    j["tiles"].back()["y"] = tile.y;
+                }
+                state = j.dump();
+            }
         }
     }
     if(state.empty() && boardFull()) {

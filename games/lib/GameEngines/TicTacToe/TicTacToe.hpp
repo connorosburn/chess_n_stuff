@@ -26,9 +26,6 @@ class TicTacToe : public Game {
     private:
         TicTacToe(TicTacToe proto, int x, int y);
         std::vector<std::vector<Player>> board;
-        nlohmann::json checkVertical();
-        nlohmann::json checkHorizontal();
-        nlohmann::json checkDiagonal();
         bool boardFull();
 };
 
