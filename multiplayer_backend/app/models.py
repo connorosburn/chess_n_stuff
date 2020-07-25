@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 class Game(models.Model):
     white = models.ForeignKey(User, on_delete=models.CASCADE, related_name='started_games')
     black = models.ForeignKey(User, on_delete=models.CASCADE, related_name='joined_games')
+    game_type = models.CharField(max_length=20)
     
 
 class Turn(models.Model):

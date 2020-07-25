@@ -3,7 +3,7 @@
 
 #include <string>
 
-const int boardSize {8};
+const int chessBoardSize {8};
 
 class ChessPosition {
     public:

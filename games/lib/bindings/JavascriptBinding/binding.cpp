@@ -1,10 +1,11 @@
 #include <emscripten/bind.h>
-#include "../GameEngines/Chess/Chess.hpp"
-#include "../AI/AI.hpp"
-#include "../GameEngines/Game.hpp"
+#include "../../AI/AI.hpp"
+#include "../../GameEngines/Game.hpp"
+#include "../GameType.hpp"
 #include <memory>
 
 std::shared_ptr<Game> game;
+GameType::GameType currentGameType;
 
 bool move(std::string gameMove) {
     return game->move(gameMove);
@@ -15,7 +16,7 @@ std::string endState() {
 }
 
 void aiMove() {
-    game = AI(game);
+    game = AI(game, currentGameType.searchDepth);
 }
 
 std::string playerTurn() {
@@ -23,15 +24,13 @@ std::string playerTurn() {
 }
 
 void newGame(std::string gameType) {
-    if(gameType == "chess") {
-        game = std::shared_ptr<Game>(new Chess());
-    }
+    currentGameType = GameType::gameTypes.at(gameType);
+    game = currentGameType.newGame();
 }
 
 void fromSnapshot(std::string gameType, std::string snapshot) {
-    if(gameType == "chess") {
-        game = std::shared_ptr<Game>(new Chess(snapshot));
-    }
+    currentGameType = GameType::gameTypes.at(gameType);
+    game = currentGameType.fromSnapshot(snapshot);
 }
 
 std::string getSnapshot() {

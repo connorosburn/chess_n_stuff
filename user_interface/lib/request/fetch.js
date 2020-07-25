@@ -37,18 +37,18 @@ export const checkLogin = async () => {
     return data;
 }
 
-export const getGames = () => {
-    return fetchBackend('/games');
+export const getGames = (gameType) => {
+    return fetchBackend(`/games/${gameType}`);
 }
 
 export const getGame = (gameID) => {
-    return fetchBackend(`/games/${gameID}`);
+    return fetchBackend(`/game/${gameID}`);
 }
 
-export const sendMove = (gameID, move) => {
-    return fetchBackend(`/games/${gameID}`, 'PATCH', {move: move});
+export const sendOnlineMove = (gameID, move) => {
+    return fetchBackend(`/game/${gameID}`, 'PATCH', {move: JSON.stringify(move)});
 }
 
-export const startGame = (move, opponent) => {
-    return fetchBackend('/games', 'POST', {move: move, opponent: opponent});
+export const startOnlineGame = (gameType, move, opponent) => {
+    return fetchBackend(`/games/${gameType}`, 'POST', {move: JSON.stringify(move), opponent: opponent});
 }

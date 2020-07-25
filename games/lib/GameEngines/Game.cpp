@@ -33,3 +33,7 @@ Player Game::playerFromString(std::string rawPlayer) {
     }
     return matchedPlayer;
 }
+
+Game::~Game() {
+
+}

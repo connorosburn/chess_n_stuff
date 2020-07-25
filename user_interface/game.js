@@ -27,9 +27,8 @@ const formulateResponse = () => {
         response.legalMoves = JSON.parse(Module.everyLegalMove());
     }
 
-
     const endState = Module.endState();
-
+    
     if(endState != '') {
         response.endState = JSON.parse(endState);
     }

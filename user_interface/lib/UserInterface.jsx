@@ -6,8 +6,7 @@ import MenuBar from './MenuBar';
 import Registration from './Users/Registration.jsx';
 import Login from './Users/Login.jsx';
 import OnlineGames from './OnlineGames';
-import LiveGameListener from './request/socket.js';
-import {checkLogin, logout, getGame, startGame} from './request/fetch'
+import {checkLogin, logout, getGame} from './request/fetch'
 
 function UserInterface(props) {
     const[displayMode, setDisplayMode] = useState('new-game');
@@ -15,7 +14,7 @@ function UserInterface(props) {
     const[loginChecked, setLoginChecked] = useState(false);
     const[activeGameConfig, setActiveGameConfig] = useState(null);
     const[resetGame, setResetGame] = useState(false);
-    const [gameType, setGameType] = useState('chess');
+    const[gameType, setGameType] = useState('tic-tac-toe');
 
     useEffect(() => {
         const loginCheck = async () => {
@@ -33,6 +32,7 @@ function UserInterface(props) {
             let response = await getGame(config.gameID);
             let data = await response.json();
             config.snapshot = data.snapshot;
+            console.log(data)
         }
         config.gameType = gameType;
         setActiveGameConfig(config);
@@ -46,6 +46,7 @@ function UserInterface(props) {
                 return (
                     <OnlineGames 
                         setUpGame={setUpGame}
+                        gameType={gameType}
                     />
                 );
             case 'registration':
@@ -86,7 +87,6 @@ function UserInterface(props) {
                         setGameID={(id) => {
                             let newConfig = activeGameConfig;
                             newConfig.gameID = id;
-                            newConfig.listener = new LiveGameListener(id);
                             setActiveGameConfig(newConfig);
                         }}
                         gameType={gameType}

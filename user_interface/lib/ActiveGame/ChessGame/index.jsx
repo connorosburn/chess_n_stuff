@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import EndReport from './EndReport.jsx';
 import PawnPromotionMenu from './PawnPromotionMenu.jsx';
-import {sendMove} from '../../request/fetch';
 import ChessGrid from './ChessGrid.jsx';
 
 function ChessGame(props) {
@@ -92,6 +91,22 @@ function ChessGame(props) {
         setDisplayMode('chess-grid');
     }
 
+    const invertBoard = (board) => {
+        let invertedBoard = [...board]
+        invertedBoard = invertedBoard.map((row) => {
+            let revRow = [...row];
+            revRow.reverse();
+            return revRow;
+        });
+        invertedBoard.reverse();
+        return invertedBoard;
+    }
+
+    const toggleInversion = () => {
+        setInverted(!inverted);
+        setRenderBoard(invertBoard(renderBoard));
+    }
+
     const displayChessGame = () => {
         switch(displayMode) {
             case 'chess-grid':
@@ -121,22 +136,6 @@ function ChessGame(props) {
         if(endState) {
             return <EndReport className="end-report" endState={endState} />
         }
-    }
-
-    const invertBoard = (board) => {
-        let invertedBoard = [...board]
-        invertedBoard = invertedBoard.map((row) => {
-            let revRow = [...row];
-            revRow.reverse();
-            return revRow;
-        });
-        invertedBoard.reverse();
-        return invertedBoard;
-    }
-
-    const toggleInversion = () => {
-        setInverted(!inverted);
-        setRenderBoard(invertBoard(renderBoard));
     }
 
     return(

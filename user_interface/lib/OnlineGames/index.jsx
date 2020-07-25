@@ -6,7 +6,7 @@ function OnlineGames(props) {
     const[gameData, setGameData] = useState({});
     useEffect(() => {
         const fetchGames = async () => {
-            let response = await getGames();
+            let response = await getGames(props.gameType);
             let data = await response.json();
             setGameData(data);
         }
@@ -19,7 +19,6 @@ function OnlineGames(props) {
             player: color,
             opponent: opponent,
             gameID: id,
-            listener: new LiveGameListener(id)
         });
     }
 
