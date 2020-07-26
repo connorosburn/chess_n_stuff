@@ -1,0 +1,53 @@
+.game-menu {
+    position: absolute;
+    margin: 0;
+    text-align: left;
+    width: 40%;
+    height: 100%;
+    background-color: black;
+    border-right: white 1px solid;
+    border-top: white 1px solid;
+    border-bottom: white 1px solid;
+    z-index: 4;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden-game-menu {
+    display: none;
+    z-index: -8;
+}
+
+.game-menu-toggle {
+    font-size: 53%;
+    z-index: 5;
+    position: absolute;
+    margin: 0;
+    text-align: center;
+    width: 20%;
+}
+
+.game-menu-button {
+    width: 100%;
+    margin: 5%;
+    border: none;
+}
+
+.hidden-game-menu-button {
+    display: none;
+}
+
+.game-menu-button:hover, .selected-game-menu-button {
+    width: 100%;
+    margin: 5%;
+    border: none;
+    background-color: white;
+    color: black;
+}
+
+.hamburger-text {
+    font-size: 62%;
+}
