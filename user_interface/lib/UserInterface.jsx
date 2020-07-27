@@ -7,6 +7,7 @@ import Registration from './Users/Registration.jsx';
 import Login from './Users/Login.jsx';
 import OnlineGames from './OnlineGames';
 import {checkLogin, logout, getGame} from './request/fetch'
+import GameMenu from './GameMenu';
 
 function UserInterface(props) {
     const[displayMode, setDisplayMode] = useState('new-game');
@@ -14,7 +15,7 @@ function UserInterface(props) {
     const[loginChecked, setLoginChecked] = useState(false);
     const[activeGameConfig, setActiveGameConfig] = useState(null);
     const[resetGame, setResetGame] = useState(false);
-    const[gameType, setGameType] = useState('tic-tac-toe');
+    const[gameType, setGameType] = useState('chess');
 
     useEffect(() => {
         const loginCheck = async () => {
@@ -97,27 +98,37 @@ function UserInterface(props) {
         }
     }
     return (
-        <div className="app-wrapper">
-            <AppHeader
-                loginChecked = {loginChecked}
-                selected={displayMode}
-                setDisplayMode={setDisplayMode}
-                userInfo={userInfo}
-                logout={async () => {
-                        setUserInfo(null)
-                        setActiveGameConfig(null)
-                        await logout();
+        <div className="app-menu-wrapper">
+            <GameMenu
+                gameType={gameType}
+                setGameType={(type) => {
+                    setGameType(type);
+                    setDisplayMode('new-game')
+                    setActiveGameConfig(null);
+                }}
+            />
+            <div className="app-wrapper">
+                <AppHeader
+                    loginChecked = {loginChecked}
+                    selected={displayMode}
+                    setDisplayMode={setDisplayMode}
+                    userInfo={userInfo}
+                    logout={async () => {
+                            setUserInfo(null)
+                            setActiveGameConfig(null)
+                            await logout();
+                        }
                     }
-                }
-            />
-            <MenuBar 
-                selected={displayMode} 
-                gameActive={activeGameConfig != null}
-                setDisplayMode={setDisplayMode}
-                loggedIn={userInfo != null}
-            />
-            <div className="app-body">
-                {displayBody()}
+                />
+                <MenuBar 
+                    selected={displayMode} 
+                    gameActive={activeGameConfig != null}
+                    setDisplayMode={setDisplayMode}
+                    loggedIn={userInfo != null}
+                />
+                <div className="app-body">
+                    {displayBody()}
+                </div>
             </div>
         </div>
     );
