@@ -1,18 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 
-function TicTacToeGame(props) {
-    const[renderBoard, setRenderBoard] = useState(null);
-    const[legalMoves, setLegalMoves] = useState(null);
-
-    useEffect(() => {
-        setRenderBoard(props.gameData.snapshot);
-        setLegalMoves(props.gameData.legalMoves);
-    }, [props.gameData]);
-
+function TicTacToeGame(props) {    
     const isLegal = (x, y) => {
         let legal = false;
-        if(legalMoves) {
-            legalMoves.forEach((position) => {
+        if(props.gameData.hasOwnProperty('legalMoves')) {
+            props.gameData.legalMoves.forEach((position) => {
                 legal = legal || (position.x == x && position.y == y);
             });
         }
@@ -35,10 +27,10 @@ function TicTacToeGame(props) {
         }
     }
 
-    if(renderBoard) {
+    if(props.gameData.hasOwnProperty('snapshot')) {
         return (
             <div className="ttt-board">
-                {renderBoard.map((row, y) => {
+                {props.gameData.snapshot.map((row, y) => {
                     return row.map((piece, x) => {
                         return (
                             <button 

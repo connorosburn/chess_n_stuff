@@ -2,6 +2,7 @@
 #define GAME_TYPE_HPP
 #include "../GameEngines/Game.hpp"
 #include "../GameEngines/Chess/Chess.hpp"
+#include "../GameEngines/ConnectFour/ConnectFour.hpp"
 #include "../GameEngines/TicTacToe/TicTacToe.hpp"
 
 namespace GameType {
@@ -41,9 +42,20 @@ namespace GameType {
         10
     );
 
+    const GameType ConnectFourGame(
+        []() {
+            return std::shared_ptr<Game>(new ConnectFour());
+        },
+        [](std::string snapshot) {
+            return std::shared_ptr<Game>(new ConnectFour(snapshot));
+        },
+        6
+    );
+
     const std::map<std::string, GameType> gameTypes {
         {"chess", ChessGame},
-        {"tic-tac-toe", TicTacToeGame}
+        {"tic-tac-toe", TicTacToeGame},
+        {"connect-four", ConnectFourGame}
     };
 };
 

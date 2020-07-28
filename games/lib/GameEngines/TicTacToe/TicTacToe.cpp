@@ -116,6 +116,8 @@ struct Coordinate {
     int y;
 };
 
+//victory determined using pre-calculated const values for performance nessecary for minmax
+
 const std::vector<std::vector<Coordinate>> potentialWins {{
     {Coordinate(0, 0), Coordinate(1, 0), Coordinate(2, 0)},
     {Coordinate(0, 1), Coordinate(1, 1), Coordinate(2, 1)},
