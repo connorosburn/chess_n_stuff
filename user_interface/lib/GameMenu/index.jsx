@@ -55,6 +55,7 @@ function GameMenu(props) {
                 {gameMenuButton('chess')}
                 {gameMenuButton('tic-tac-toe')}
                 {gameMenuButton('connect-four')}
+                {gameMenuButton('checkers')}
             </div>
         </div>
     );

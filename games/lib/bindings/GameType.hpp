@@ -4,6 +4,7 @@
 #include "../GameEngines/Chess/Chess.hpp"
 #include "../GameEngines/ConnectFour/ConnectFour.hpp"
 #include "../GameEngines/TicTacToe/TicTacToe.hpp"
+#include "../GameEngines/Checkers/Checkers.hpp"
 
 namespace GameType {
     struct GameType {
@@ -52,10 +53,21 @@ namespace GameType {
         6
     );
 
+    const GameType CheckersGame(
+        []() {
+            return std::shared_ptr<Game>(new Checkers());
+        },
+        [](std::string snapshot) {
+            return std::shared_ptr<Game>(new Checkers(snapshot));
+        },
+        6
+    );
+
     const std::map<std::string, GameType> gameTypes {
         {"chess", ChessGame},
         {"tic-tac-toe", TicTacToeGame},
-        {"connect-four", ConnectFourGame}
+        {"connect-four", ConnectFourGame},
+        {"checkers", CheckersGame}
     };
 };
 
