@@ -24,7 +24,7 @@ function CheckersGame(props) {
     if(props.gameData) {
         const board = props.gameData.snapshot.board;
         return (
-            <div className="chess-board">
+            <div className="grid-container">
                 {board.map((row, y) => {
                     if(inverted) {
                         y = board.length - 1 - y;
@@ -36,11 +36,10 @@ function CheckersGame(props) {
                             }
                             return (
                                 <button 
-                                    className={`chess-tile ${tileClass(x, y)}`}
-                                    onClick={() => clickTile({x: x, y: y})}
+                                    className={`grid-tile-${row.length} ${tileClass(x, y)}`}
                                     key={x}
                                 >
-                                    <div className={`checkers-piece checkers-${piece.player}`}>
+                                    <div className={`grid-content ${piece.player}-piece`}>
                                         {pieceCharacter(x, y)}
                                     </div>
                                 </button>

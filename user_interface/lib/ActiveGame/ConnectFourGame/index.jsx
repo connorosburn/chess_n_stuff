@@ -2,9 +2,9 @@ import React from 'react';
 
 function ConnectFourGame(props) {
     const tileClass = (x, y, type) => {
-        let className = `connect-four-${type}`;
+        let className = `${type}-tile`;
         if(type == 'null') {
-            className = 'grey';
+            className = 'medium-tile';
         }
         return className;
     }
@@ -14,7 +14,7 @@ function ConnectFourGame(props) {
     };
 
     const dropperClass = (x) => {
-        let type = 'grey';
+        let type = 'medium-tile';
         if(isLegal(x)) {
             type = 'selectable-tile';
         }
@@ -29,10 +29,10 @@ function ConnectFourGame(props) {
 
     if(props.gameData.hasOwnProperty('snapshot')) {
         return (
-            <div className="connect-four-board">
+            <div className="grid-container">
                 {Array(props.gameData.snapshot[0].length).fill().map((_, x) => {
                     return (
-                        <button className={`connect-four-tile ${dropperClass(x)}`} onClick={() => dropTile(x)} key={x}>
+                        <button className={`grid-tile-7 ${dropperClass(x)}`} onClick={() => dropTile(x)} key={x}>
                         </button>
                     );
                 })}
@@ -40,7 +40,7 @@ function ConnectFourGame(props) {
                         return row.map((piece, x) => {
                             return (
                                 <button 
-                                    className={`${tileClass(x, y, piece)} connect-four-tile`}
+                                    className={`grid-tile-${row.length} ${tileClass(x, y, piece)} divided-tile`}
                                     key={x}
                                 >
                                     

@@ -134,16 +134,15 @@ function ChessGame(props) {
 
     const displayEndReport = () => {
         if(endState) {
-            return <EndReport className="end-report" endState={endState} />
+            return <EndReport endState={endState} />
         }
     }
 
     return(
-        <div className="chess-game">
+        <div className="grid-container">
             {displayChessGame()}
             <button 
                 onClick={toggleInversion}
-                className="chess-inversion-button"
             >
                 Invert Board
             </button>
