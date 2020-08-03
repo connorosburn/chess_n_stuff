@@ -12,11 +12,11 @@ function TicTacToeGame(props) {
     }
 
     const buttonClass = (x, y, type) => {
-        let className = `ttt-${type}`;
+        let className = `${type}-tile`;
         if(isLegal(x, y)) {
             className = 'selectable-tile';
         } else if(type == 'null') {
-            className = 'grey';
+            className = 'medium-tile';
         }
         return className;
     }
@@ -29,12 +29,12 @@ function TicTacToeGame(props) {
 
     if(props.gameData.hasOwnProperty('snapshot')) {
         return (
-            <div className="ttt-board">
+            <div className="grid-container">
                 {props.gameData.snapshot.map((row, y) => {
                     return row.map((piece, x) => {
                         return (
                             <button 
-                                className={`${buttonClass(x, y, piece)} ttt-tile`} 
+                                className={`grid-tile-${row.length} ${buttonClass(x, y, piece)} divided-tile`} 
                                 key={x}
                                 onClick={() => clickTile(x, y)}
                             >

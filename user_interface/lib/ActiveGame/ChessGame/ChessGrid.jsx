@@ -88,7 +88,7 @@ function ChessGrid(props) {
 
     if(props.renderBoard) {
         return (
-            <div className="chess-board">
+            <div className="grid-container">
                 {props.renderBoard.map((row, y) => {
                     if(props.inverted) {
                         y = props.renderBoard.length - 1 - y;
@@ -100,11 +100,11 @@ function ChessGrid(props) {
                             }
                             return (
                                 <button 
-                                    className={`chess-tile ${tileClass(x, y)}`}
+                                    className={`grid-tile-${row.length} ${tileClass(x, y)}`}
                                     onClick={() => clickTile({x: x, y: y})}
                                     key={x}
                                 >
-                                    <div className={`chess-piece ${piece.player}`} key={x}>
+                                    <div className={`grid-content ${piece.player}-piece`}>
                                         {pieceCharacter(piece.type)}
                                     </div>
                                 </button>
