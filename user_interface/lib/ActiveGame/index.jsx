@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ChessGame from './ChessGame';
 import TicTacToeGame from './TicTacToeGame';
 import ConnectFourGame from './ConnectFourGame';
+import CheckersGame from './CheckersGame';
 import {startOnlineGame, sendOnlineMove} from '../request/fetch'
 
 function ActiveGame(props) {
@@ -93,6 +94,13 @@ function ActiveGame(props) {
             case 'connect-four':
                 return (
                     <ConnectFourGame
+                        sendMove={sendMove}
+                        gameData={gameData}
+                    />
+                );
+            case 'checkers':
+                return (
+                    <CheckersGame
                         sendMove={sendMove}
                         gameData={gameData}
                     />
