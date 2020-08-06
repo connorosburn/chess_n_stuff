@@ -10,9 +10,19 @@ const int checkersBoardSize { 8 };
 
 const std::vector<std::vector<CheckersPiece>> defaultCheckersBoard {{
     {
-        CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White),
-        CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White)
+        CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black),
+        CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black)
     },
+    {
+        CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(),
+        CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece()
+    },
+    {
+        CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black),
+        CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black)
+    },
+    std::vector<CheckersPiece>(checkersBoardSize, CheckersPiece()),
+    std::vector<CheckersPiece>(checkersBoardSize, CheckersPiece()),
     {
         CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(),
         CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White), CheckersPiece()
@@ -21,19 +31,9 @@ const std::vector<std::vector<CheckersPiece>> defaultCheckersBoard {{
         CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White),
         CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White)
     },
-    std::vector<CheckersPiece>(checkersBoardSize, CheckersPiece()),
-    std::vector<CheckersPiece>(checkersBoardSize, CheckersPiece()),
     {
-        CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(),
-        CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece()
-    },
-    {
-        CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White),
-        CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White)
-    },
-    {
-        CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece(),
-        CheckersPiece(Player::Black), CheckersPiece(), CheckersPiece(Player::Black), CheckersPiece()
+        CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White), CheckersPiece(),
+        CheckersPiece(Player::White), CheckersPiece(), CheckersPiece(Player::White), CheckersPiece()
     }
 }};
 

@@ -104,7 +104,7 @@ function ChessGrid(props) {
                                     onClick={() => clickTile({x: x, y: y})}
                                     key={x}
                                 >
-                                    <div className={`grid-content ${piece.player}-piece`}>
+                                    <div className={`grid-content ${piece.player}-text`}>
                                         {pieceCharacter(piece.type)}
                                     </div>
                                 </button>

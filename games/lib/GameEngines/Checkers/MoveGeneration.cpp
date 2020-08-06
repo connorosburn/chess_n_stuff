@@ -44,9 +44,9 @@ std::vector<CheckersPosition> movementDirections(const CheckersPiece& piece) {
     if(piece.getType() == CheckersType::King) {
         directions = {CheckersPosition(1, 1), CheckersPosition(1, -1), CheckersPosition(-1, 1), CheckersPosition(-1, -1)};
     } else if(piece.getPlayer() == Player::White) {
-        directions = {CheckersPosition(1, 1), CheckersPosition(-1, 1)};
-    } else if(piece.getPlayer() == Player::Black) {
         directions = {CheckersPosition(1, -1), CheckersPosition(-1, -1)};
+    } else if(piece.getPlayer() == Player::Black) {
+        directions = {CheckersPosition(1, 1), CheckersPosition(-1, 1)};
     }
     return directions;
 }
@@ -86,9 +86,11 @@ std::vector<Game*> Checkers::everyJumpOutcomeFrom(int x, int y, std::vector<std:
             copyBoard[currentPosition.y][currentPosition.x] = CheckersPiece();
             copyBoard[attackTile.y][attackTile.x] = CheckersPiece();
             if(kingEligible(copyBoard[destinationTile.y][destinationTile.x], destinationTile)) {
+                copyBoard[destinationTile.y][destinationTile.x].makeKing();
                 outcomes.emplace_back(new Checkers(copyBoard, turnCount + 1));
             } else {
                 std::vector<Game*> childOutcomes { everyJumpOutcomeFrom(destinationTile.x, destinationTile.y, copyBoard) };
+                outcomes.insert(outcomes.end(), childOutcomes.begin(), childOutcomes.end());
             }
         }
     }
@@ -107,7 +109,10 @@ std::vector<Game*> Checkers::everyOutcomeFrom(int x, int y) {
         if(standardMove.onBoard() && board[standardMove.y][standardMove.x].getPlayer() == Player::Null) {
             std::vector<std::vector<CheckersPiece>> copyBoard = board;
             copyBoard[standardMove.y][standardMove.x] = copyBoard[y][x];
-            copyBoard[y][x] = Player::Null;
+            copyBoard[y][x] = CheckersPiece();
+            if(kingEligible(copyBoard[standardMove.y][standardMove.x], standardMove)) {
+                copyBoard[standardMove.y][standardMove.x].makeKing();
+            }
             games.emplace_back(new Checkers(copyBoard, turnCount + 1));
         } else if(jumpAvailable(board, currentPosition, direction)) {
             const CheckersPosition attackTile { currentPosition + direction };
@@ -116,8 +121,17 @@ std::vector<Game*> Checkers::everyOutcomeFrom(int x, int y) {
             copyBoard[destinationTile.y][destinationTile.x] = copyBoard[currentPosition.y][currentPosition.x];
             copyBoard[currentPosition.y][currentPosition.x] = CheckersPiece();
             copyBoard[attackTile.y][attackTile.x] = CheckersPiece();
-            std::vector<Game*> jumpOutcomes { everyJumpOutcomeFrom(x, y, copyBoard) };
-            games.insert(games.end(), jumpOutcomes.begin(), jumpOutcomes.end());
+            if(!kingEligible(copyBoard[destinationTile.y][destinationTile.x], destinationTile)) {
+                std::vector<Game*> jumpOutcomes { everyJumpOutcomeFrom(destinationTile.x, destinationTile.y, copyBoard) };
+                if(jumpOutcomes.empty()) {
+                    games.emplace_back(new Checkers(copyBoard, turnCount + 1));
+                } else {
+                    games.insert(games.end(), jumpOutcomes.begin(), jumpOutcomes.end());
+                }
+            } else {
+                copyBoard[destinationTile.y][destinationTile.x].makeKing();
+                games.emplace_back(new Checkers(copyBoard, turnCount + 1));
+            }
         }
     }
     return games;
@@ -156,6 +170,7 @@ nlohmann::json everySerializedJumpFrom(int x, int y, std::vector<std::vector<Che
             copyBoard[destinationPosition.y][destinationPosition.x] = copyBoard[currentPosition.y][currentPosition.x];
             copyBoard[currentPosition.y][currentPosition.x] = CheckersPiece();
             copyBoard[attackPosition.y][attackPosition.x] = CheckersPiece();
+            move["childJumps"] = nlohmann::json::array();
             if(!kingEligible(copyBoard[destinationPosition.y][destinationPosition.x], destinationPosition)) {
                 move["childJumps"] = everySerializedJumpFrom(destinationPosition.x, destinationPosition.y, copyBoard);
             }
@@ -193,6 +208,7 @@ nlohmann::json Checkers::everySerializedMoveFrom(int x, int y) {
                 copyBoard[destinationPosition.y][destinationPosition.x].getType() == CheckersType::Soldier &&
                 (destinationPosition.y == 0 || destinationPosition.y == checkersBoardSize - 1)
             };
+            move["childJumps"] = nlohmann::json::array();
             if(!kingEligible) {
                 move["childJumps"] = everySerializedJumpFrom(destinationPosition.x, destinationPosition.y, copyBoard);
             }
@@ -259,6 +275,11 @@ bool Checkers::move(std::string gameMove) {
     if(standardMove) {
         board[first.y][first.x] = board[start.y][start.x];
         board[start.y][start.x] = CheckersPiece();
+        valid = true;
+        if(kingEligible(board[first.y][first.x], first)) {
+            board[first.y][first.x].makeKing();
+        }
+        turnCount++;
     } else {
         std::vector<std::vector<CheckersPiece>> runningBoard { board };
         CheckersPosition lastPosition { start };
@@ -266,22 +287,27 @@ bool Checkers::move(std::string gameMove) {
             const CheckersPosition position(parsedMove["path"][i]);
             const CheckersPosition direction { (position - lastPosition) / 2 };
             const bool jumpValid {
-                jumpAvailable(runningBoard, position, direction) &&
+                jumpAvailable(runningBoard, lastPosition, direction) &&
                 std::any_of(directions.begin(), directions.end(), [&direction](CheckersPosition p) {
                     return direction == p;
                 })
             };
             valid = valid && jumpValid;
+            if(kingEligible(runningBoard[lastPosition.y][lastPosition.x], position)) {
+                runningBoard[lastPosition.y][lastPosition.x].makeKing();
+                valid = valid && i == parsedMove["path"].size() - 1;
+            }
             if(valid) {
                 const CheckersPosition attackPosition {lastPosition + direction};
-                runningBoard[lastPosition.y][lastPosition.x] = runningBoard[position.y][position.x];
-                runningBoard[position.y][position.x] = CheckersPiece();
+                runningBoard[position.y][position.x] = runningBoard[lastPosition.y][lastPosition.x];
+                runningBoard[lastPosition.y][lastPosition.x] = CheckersPiece();
                 runningBoard[attackPosition.y][attackPosition.x] = CheckersPiece();
             }
             lastPosition = position;
         }
         if(valid) {
             board = runningBoard;
+            turnCount++;
         }
     }
     return valid;

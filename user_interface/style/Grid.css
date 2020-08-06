@@ -75,10 +75,16 @@
     background-color: #0000ff;
 }
 
-.black-piece {
+.black-text {
     color: #000000;
 }
 
-.white-piece {
+.white-text {
     color: #ffffff;
+}
+
+.king-label {
+    font-size: 50%;
+    padding-top: 25%;
+    padding-bottom: 75%;
 }
