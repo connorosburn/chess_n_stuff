@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import LiveGameListener from '../RequestHandler/socket.js'
+import LiveGameListener from '../request/socket.js';
+import {getGames} from '../request/fetch';
 
 function OnlineGames(props) {
     const[gameData, setGameData] = useState({});
     useEffect(() => {
         const fetchGames = async () => {
-            let response = await props.getGames();
+            let response = await getGames(props.gameType);
             let data = await response.json();
             setGameData(data);
         }
@@ -18,7 +19,6 @@ function OnlineGames(props) {
             player: color,
             opponent: opponent,
             gameID: id,
-            listener: new LiveGameListener(id)
         });
     }
 

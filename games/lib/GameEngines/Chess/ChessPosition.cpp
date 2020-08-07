@@ -1,8 +1,8 @@
 #include "ChessPosition.hpp"
-#include <array>
+#include <vector>
 #include <algorithm>
 
-const std::array<char, 8> letteredPositions {{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}};
+const std::vector<char> letteredPositions { {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'} };
 
 ChessPosition::ChessPosition(std::string notationString) {
     if(notationStringValid(notationString)) {
@@ -35,11 +35,11 @@ bool ChessPosition::notationStringValid(std::string notationString) {
 void ChessPosition::valuesFromString(std::string notationString) {
     auto position = std::find(letteredPositions.begin(), letteredPositions.end(), notationString.front());
     x = std::distance(letteredPositions.begin(), position);
-    y = boardSize - std::stoi(notationString.substr(1, 1));
+    y = chessBoardSize - std::stoi(notationString.substr(1, 1));
 }
 
 bool ChessPosition::onBoard() const {
-    return x >= 0 && x < boardSize && y >= 0 && y < boardSize;
+    return x >= 0 && x < chessBoardSize && y >= 0 && y < chessBoardSize;
 }
 
 bool ChessPosition::operator==(ChessPosition position) const {

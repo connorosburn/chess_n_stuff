@@ -2,30 +2,30 @@
 #define CHESS_PIECE_HPP
 
 #include "../../json.hpp"
-using namespace nlohmann;
+#include "../Game.hpp"
 
 #include <string>
 
+enum class PieceType {Pawn, Rook, Knight, Bishop, Queen, King, EnPassant, Null};
+
 class ChessPiece {
     public:
-        ChessPiece(char pieceType, int playerNumber);
+        ChessPiece(PieceType pieceType, Player playerColor);
         ChessPiece();
-        ChessPiece(json j);
-        json serialize();
-        std::string toString();
-        bool isNull();
-        bool enPassant();
-        int getPlayer();
-        char getType();
+        ChessPiece(nlohmann::json j);
+        nlohmann::json serialize();
+        Player getPlayer();
+        PieceType getType();
         bool hasMoved();
         void move();
+        bool isEmpty();
+        std::string notationString();
+        static const std::map<PieceType, std::string> typeString;
+        static PieceType typeFromString(std::string rawType);
     private:
-        int player;
-        char type;
-        bool null;
-        bool enpassant;
+        Player player;
+        PieceType type;
         bool moved;
-        bool pieceValid(char pieceType, int playerNumber);
 };
 
 #endif

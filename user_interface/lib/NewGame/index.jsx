@@ -42,13 +42,13 @@ function NewGame(props) {
                 onClick={() => setUpAIGame('white')}
                 className="mode-button"
             >
-                White
+                You move first
             </button>
             <button
                 onClick={() => setUpAIGame('black')}
                 className="mode-button"
             >
-                Black
+                AI moves first
             </button>
         </div>
     );

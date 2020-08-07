@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views import View
-import app.cpp_wrapper.cpp_chess as cpp_chess
+import app.cpp_wrapper.cpp_games as cpp_games
 from app.models import Game, Turn
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -13,6 +13,7 @@ import json
 @method_decorator(login_required, name='dispatch')
 class GameView(View):
     def get(self, request, **kwargs):
+        print('sfsdfdsf')
         game = Game.objects.get(id=kwargs['id'])
         if game.white == request.user or game.black == request.user:
             return JsonResponse(game_serializer(game))
@@ -29,13 +30,10 @@ class GameView(View):
     def _save_move(self, color, game, move):
             last_turn = game.turns.last()
             new_board = ''
-            if 'pieceType' not in move:
-                new_board = cpp_chess.move(last_turn.snapshot, move['start']['x'], move['start']['y'], move['end']['x'], move['end']['y'])
-            else:
-                new_board = cpp_chess.promote_pawn(last_turn.snapshot, move['start']['x'], move['start']['y'], move['end']['x'], move['end']['y'], move['pieceType'])
+            new_board = cpp_games.from_snapshot(game.game_type, move, last_turn.snapshot)
             if new_board != '':
                 channel_layer = get_channel_layer()
-                async_to_sync(channel_layer.group_send)(str(game.id), {"type": 'receive_move', "move": move})
+                async_to_sync(channel_layer.group_send)(str(game.id), {"type": 'receive_move', "move": move, "player": color})
                 new_turn = Turn(game=game, color_moved=color, snapshot=new_board)
                 new_turn.save()
                 return JsonResponse({'success': True})

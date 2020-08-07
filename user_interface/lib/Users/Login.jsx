@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {login} from '../request/fetch'
 
 function Login(props) {
     const[username, setUsername] = useState('');
@@ -6,7 +7,7 @@ function Login(props) {
 
     const submitForm = async (event) => {
         event.preventDefault();
-        let response = await props.login(username, password);
+        let response = await login(username, password);
         let data = await response.json();
         if(response.status == 200) {
             props.setUserInfo(data);

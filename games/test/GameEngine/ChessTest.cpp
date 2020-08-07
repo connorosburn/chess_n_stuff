@@ -1,5 +1,5 @@
 #include "../catch.hpp"
-#include "../../lib/GameEngine/Chess.hpp"
+#include "../../lib/GameEngines/Chess/Chess.hpp"
 
 TEST_CASE("The game starts with zero moves") {
     Chess chess;
@@ -8,12 +8,18 @@ TEST_CASE("The game starts with zero moves") {
 
 TEST_CASE("Can tell you where pieces are") {
     Chess chess;
-    REQUIRE(chess.getPiece("a2").toString() == "p0");
-    REQUIRE(chess.getPiece("a1").toString() == "r0");
-    REQUIRE(chess.getPiece("a7").toString() == "p1");
-    REQUIRE(chess.getPiece("a8").toString() == "r1");
-    REQUIRE(chess.getPiece("c8").toString() == "b1");
-    REQUIRE(chess.getPiece("d1").toString() == "q0");
+    REQUIRE(chess.getPiece("a2").getType() == PieceType::Pawn);
+    REQUIRE(chess.getPiece("a2").getPlayer() == Player::White);
+    REQUIRE(chess.getPiece("a1").getType() == PieceType::Rook);
+    REQUIRE(chess.getPiece("a1").getPlayer() == Player::White);
+    REQUIRE(chess.getPiece("a7").getType() == PieceType::Pawn);
+    REQUIRE(chess.getPiece("a7").getPlayer() == Player::Black);
+    REQUIRE(chess.getPiece("a8").getType() == PieceType::Rook);
+    REQUIRE(chess.getPiece("a8").getPlayer() == Player::Black);
+    REQUIRE(chess.getPiece("c8").getType() == PieceType::Bishop);
+    REQUIRE(chess.getPiece("c8").getPlayer() == Player::Black);
+    REQUIRE(chess.getPiece("d1").getType() == PieceType::Queen);
+    REQUIRE(chess.getPiece("d1").getPlayer() == Player::White);
 }
 
 TEST_CASE("Increments the turn counter") {
@@ -35,8 +41,10 @@ TEST_CASE("Allows a pawn to move twice on its first move") {
     Chess chess;
     REQUIRE(chess.move("a2", "a4"));
     REQUIRE(chess.move("c7", "c5"));
-    REQUIRE(chess.getPiece("a4").toString() == "p0");
-    REQUIRE(chess.getPiece("c5").toString() == "p1");
+    REQUIRE(chess.getPiece("a4").getType() == PieceType::Pawn);
+    REQUIRE(chess.getPiece("a4").getPlayer() == Player::White);
+    REQUIRE(chess.getPiece("c5").getType() == PieceType::Pawn);
+    REQUIRE(chess.getPiece("c5").getPlayer() == Player::Black);
 }
 
 TEST_CASE("Does not allow a pawn to move twice after the first move") {
@@ -125,27 +133,27 @@ TEST_CASE("Allows king to move properly") {
 
 const std::vector<std::vector<ChessPiece>> inCheckBoard {
     {    
-        {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
-        {ChessPiece('p', 1), ChessPiece('b', 1), ChessPiece('p', 1), ChessPiece(), ChessPiece('q', 1), ChessPiece('q', 0), ChessPiece(), ChessPiece()},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('k', 1)},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 1)},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece()},
+        {ChessPiece(PieceType::Rook, Player::Black), ChessPiece(PieceType::Knight, Player::Black), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Bishop, Player::Black), ChessPiece(PieceType::Knight, Player::Black), ChessPiece(PieceType::Rook, Player::Black)},
+        {ChessPiece(PieceType::Pawn, Player::Black), ChessPiece(PieceType::Bishop, Player::Black), ChessPiece(PieceType::Pawn, Player::Black), ChessPiece(), ChessPiece(PieceType::Queen, Player::Black), ChessPiece(PieceType::Queen, Player::White), ChessPiece(), ChessPiece()},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::King, Player::Black)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::Black)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(), ChessPiece(), ChessPiece()},
         {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
-        {ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece()},
-        {ChessPiece('r', 0), ChessPiece('n', 0), ChessPiece('b', 0), ChessPiece(), ChessPiece('k', 0), ChessPiece(), ChessPiece(), ChessPiece('r', 0)}
+        {ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece()},
+        {ChessPiece(PieceType::Rook, Player::White), ChessPiece(PieceType::Knight, Player::White), ChessPiece(PieceType::Bishop, Player::White), ChessPiece(), ChessPiece(PieceType::King, Player::White), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Rook, Player::White)}
     }
 };
 
 TEST_CASE("It detects check") {
     Chess chess(inCheckBoard, 0);
 
-    REQUIRE(chess.inCheck(1));
-    REQUIRE(!chess.inCheck(0));
+    REQUIRE(chess.inCheck(Player::Black));
+    REQUIRE(!chess.inCheck(Player::White));
 
     chess = Chess();
 
-    REQUIRE(!chess.inCheck(1));
-    REQUIRE(!chess.inCheck(0));
+    REQUIRE(!chess.inCheck(Player::Black));
+    REQUIRE(!chess.inCheck(Player::White));
 }
 
 TEST_CASE("It wont let a player move into check") {
@@ -161,33 +169,16 @@ TEST_CASE("It wont let a player move into check") {
 
 const std::vector<std::vector<ChessPiece>> checkMateBoard {
     {    
-        {ChessPiece('r', 1), ChessPiece('n', 1), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('b', 1), ChessPiece('n', 1), ChessPiece('r', 1)},
-        {ChessPiece('p', 1), ChessPiece('b', 1), ChessPiece('p', 1), ChessPiece(), ChessPiece(), ChessPiece('q', 0), ChessPiece(), ChessPiece()},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('k', 1)},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('q', 1), ChessPiece('r', 0)},
-        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece()},
+        {ChessPiece(PieceType::Rook, Player::Black), ChessPiece(PieceType::Knight, Player::Black), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Bishop, Player::Black), ChessPiece(PieceType::Knight, Player::Black), ChessPiece(PieceType::Rook, Player::Black)},
+        {ChessPiece(PieceType::Pawn, Player::Black), ChessPiece(PieceType::Bishop, Player::Black), ChessPiece(PieceType::Pawn, Player::Black), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Queen, Player::White), ChessPiece(), ChessPiece()},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::King, Player::Black)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Queen, Player::Black), ChessPiece(PieceType::Rook, Player::White)},
+        {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(), ChessPiece(), ChessPiece()},
         {ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece(), ChessPiece()},
-        {ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece(), ChessPiece(), ChessPiece('p', 0), ChessPiece('p', 0), ChessPiece()},
-        {ChessPiece('r', 0), ChessPiece('n', 0), ChessPiece('b', 0), ChessPiece(), ChessPiece('k', 0), ChessPiece(), ChessPiece(), ChessPiece()}
+        {ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(), ChessPiece(), ChessPiece(PieceType::Pawn, Player::White), ChessPiece(PieceType::Pawn, Player::White), ChessPiece()},
+        {ChessPiece(PieceType::Rook, Player::White), ChessPiece(PieceType::Knight, Player::White), ChessPiece(PieceType::Bishop, Player::White), ChessPiece(), ChessPiece(PieceType::King, Player::White), ChessPiece(), ChessPiece(), ChessPiece()}
     }
 };
-
-TEST_CASE("It detects checkmate") {
-    Chess chess;
-
-    auto endState = chess.endState();
-
-    REQUIRE(endState.condition == "");
-    REQUIRE(endState.winner != 1);
-    REQUIRE(endState.winner != 0);
-    
-    chess = Chess(checkMateBoard, 1);
-
-    endState = chess.endState();
-
-    REQUIRE(endState.condition == "checkmate");
-    REQUIRE(endState.winner == 0);
-}
 
 TEST_CASE("It follows the en passant rule") {
     Chess chess;
@@ -197,7 +188,7 @@ TEST_CASE("It follows the en passant rule") {
     REQUIRE(chess.move("b5", "b4"));
     REQUIRE(chess.move("a2", "a4"));
     REQUIRE(chess.move("b4", "a3"));
-    REQUIRE(chess.getPiece("a4").isNull());
+    REQUIRE(chess.getPiece("a4").isEmpty());
 }
 
 TEST_CASE("En Passant oppurtunity gone after one turn") {
@@ -221,9 +212,9 @@ TEST_CASE("It allows pawn promotion") {
     REQUIRE(chess.move("a6", "b7"));
     REQUIRE(chess.move("f7", "f6"));
     REQUIRE(!chess.move("b7", "a8"));
-    REQUIRE(chess.move("b7", "a8", 'q'));
-    REQUIRE(chess.getPiece("a8").getType() =='q');
-    REQUIRE(chess.getPiece("a8").getPlayer() == 0);
+    REQUIRE(chess.move("b7", "a8", PieceType::Queen));
+    REQUIRE(chess.getPiece("a8").getType() == PieceType::Queen);
+    REQUIRE(chess.getPiece("a8").getPlayer() == Player::White);
 }
 
 TEST_CASE("It follows castling rules") {
@@ -239,35 +230,25 @@ TEST_CASE("It follows castling rules") {
     REQUIRE(chess.move("a2", "a3"));
     REQUIRE(chess.move("e8", "c8")); 
 
-    REQUIRE(chess.getPiece("g1").toString() == "k0");
-    REQUIRE(chess.getPiece("f1").toString() == "r0");
-    REQUIRE(chess.getPiece("c8").toString() == "k1");
-    REQUIRE(chess.getPiece("d8").toString() == "r1");
+    REQUIRE(chess.getPiece("g1").getType() == PieceType::King);
+    REQUIRE(chess.getPiece("g1").getPlayer() == Player::White);
+    REQUIRE(chess.getPiece("f1").getType() == PieceType::Rook);
+    REQUIRE(chess.getPiece("f1").getPlayer() == Player::White);
+    REQUIRE(chess.getPiece("c8").getType() == PieceType::King);
+    REQUIRE(chess.getPiece("c8").getPlayer() == Player::Black);
+    REQUIRE(chess.getPiece("d8").getType() == PieceType::Rook);
+    REQUIRE(chess.getPiece("d8").getPlayer() == Player::Black);
 }
 
 TEST_CASE("It serializes and deserializes properly") {
-    Chess chess;
+    Chess original;
+    Chess copy(original.getSnapshot());
 
-    REQUIRE(chess.move("e2", "e3"));
-    REQUIRE(chess.move("d7", "d5"));
-    REQUIRE(chess.move("f1", "e2"));
-
-    std::string jsonString = chess.serialize();
-
-    Chess deserializedChess(jsonString);
-
-    for(int y = 0; y < boardSize; y++) {
-        for(int x = 0; x < boardSize; x++) {
-            ChessPiece pieceOne = chess.getPiece(x, y);
-            ChessPiece pieceTwo = deserializedChess.getPiece(x, y);
-            REQUIRE(pieceOne.isNull() == pieceTwo.isNull());
-            REQUIRE(pieceOne.enPassant() == pieceTwo.enPassant());
-            REQUIRE(pieceOne.getPlayer() == pieceTwo.getPlayer());
-            REQUIRE(pieceOne.getType() == pieceTwo.getType());
-            REQUIRE(pieceOne.hasMoved() == pieceTwo.hasMoved());
+    for(int x = 0; x < chessBoardSize; x++) {
+        for(int y = 0; y < chessBoardSize; y++) {
+            REQUIRE(original.getPiece(x, y).getType() == copy.getPiece(x, y).getType());
+            REQUIRE(original.getPiece(x, y).getPlayer() == copy.getPiece(x, y).getPlayer());
         }
     }
-
-    REQUIRE(chess.getTurnCount() == deserializedChess.getTurnCount());
-    
 }
+

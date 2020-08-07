@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {register} from '../request/fetch';
 
 function Registration(props) {
     const[username, setUsername] = useState('');
@@ -7,7 +8,7 @@ function Registration(props) {
 
     const submitForm = async (event) => {
         event.preventDefault();    
-        let response = await props.register(username, password, passwordConfirmation);
+        let response = await register(username, password, passwordConfirmation);
         let data = await response.json();
         if(response.status == 200) {
             props.setUserInfo(data);

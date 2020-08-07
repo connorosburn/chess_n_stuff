@@ -6,8 +6,8 @@ class LiveUpdate(JsonWebsocketConsumer):
         self.accept()
 
     def receive_move(self, event):
-        print(event['move'])
-        self.send_json(event['move'])
+        print(event)
+        self.send_json({'move': event['move'], 'player': event['player']})
 
     def receive_json(self, content):
         print(content)

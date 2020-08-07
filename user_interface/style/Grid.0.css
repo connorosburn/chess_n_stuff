@@ -1,0 +1,123 @@
+.grid-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.grid-tile-8 {
+    border: none;
+    padding-left: 0;
+    width: 12.5%;
+    padding-bottom: 12.5%;
+    position: relative;
+}
+
+.grid-tile-7 {
+    border: none;
+    padding-left: 0;
+    width: 14.28%;
+    padding-bottom: 14.28%;
+    position: relative;
+}
+
+.grid-tile-3 {
+    border: none;
+    padding-left: 0;
+    width: 33.33%;
+    padding-bottom: 33.33%;
+    position: relative;
+}
+
+.divided-tile {
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+.grid-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.light-tile, .light-tile:hover {
+    background-color: #bfbfbf;
+}
+
+.dark-tile, .dark-tile:hover {
+    background-color: #3f3f3f;
+}
+
+.medium-tile, .medium-tile:hover {
+    background-color: #7f7f7f;
+}
+
+.black-tile, .black-tile:hover {
+    background-color: #000000;
+}
+
+.white-tile, .white-tile:hover {
+    background-color: #ffffff;
+}
+
+.selected-tile, .selected-tile:hover {
+    background-color: #6f2da8;
+}
+
+.selectable-tile, .selectable-tile:hover {
+    background-color: #bf00ff;
+}
+
+.changed-tile, .changed-tile:hover {
+    background-color: #0000ff;
+}
+
+.black-text, .black-text:hover {
+    color: #000000;
+}
+
+.white-text, .white-text:hover {
+    color: #ffffff;
+}
+
+.dark-grey-text, .dark-grey-text:hover {
+    color: #3f3f3f;
+}
+
+.king-label {
+    font-size: 50%;
+    padding-top: 25%;
+    padding-bottom: 75%;
+}
+
+.inversion-button {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.end-report {
+    text-align: center;
+}
+
+.dropper-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 5%;
+    box-sizing: border-box;
+}
+
+.connect-four-dropper {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
