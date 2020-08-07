@@ -88,3 +88,11 @@
     padding-top: 25%;
     padding-bottom: 75%;
 }
+
+.inversion-button {
+    width: 100%;
+}
+
+.end-report {
+    text-align: center;
+}
