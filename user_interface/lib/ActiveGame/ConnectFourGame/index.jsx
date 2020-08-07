@@ -1,4 +1,5 @@
 import React from 'react';
+import Droppers from './Droppers'
 
 function ConnectFourGame(props) {
     const tileClass = (x, y, type) => {
@@ -10,16 +11,8 @@ function ConnectFourGame(props) {
     }
 
     const isLegal = (x) => {
-        return props.gameData.hasOwnProperty('legalMoves') && props.gameData.legalMoves.includes(x)
+        return props.gameData.hasOwnProperty('legalMoves') && props.gameData.legalMoves.includes(x);
     };
-
-    const dropperClass = (x) => {
-        let type = 'medium-tile';
-        if(isLegal(x)) {
-            type = 'selectable-tile';
-        }
-        return type;
-    }
 
     const dropTile = (x) => {
         if(isLegal(x)) {
@@ -28,14 +21,15 @@ function ConnectFourGame(props) {
     }
 
     if(props.gameData.hasOwnProperty('snapshot')) {
+        console.log(props.gameData);
         return (
             <div className="grid-container">
-                {Array(props.gameData.snapshot[0].length).fill().map((_, x) => {
-                    return (
-                        <button className={`grid-tile-7 ${dropperClass(x)}`} onClick={() => dropTile(x)} key={x}>
-                        </button>
-                    );
-                })}
+                <Droppers 
+                    isLegal={isLegal}
+                    dropTile={dropTile}
+                    length={props.gameData.snapshot[0].length}
+                    playerTurn={props.gameData.playerTurn}
+                />
                 {props.gameData.snapshot.map((row, y) => {
                         return row.map((piece, x) => {
                             return (

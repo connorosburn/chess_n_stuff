@@ -40,12 +40,22 @@
     display: none;
 }
 
-.game-menu-button:hover, .selected-game-menu-button {
+.selected-game-menu-button {
     width: 100%;
     margin: 5%;
     border: none;
     background-color: white;
     color: black;
+}
+
+@media(hover: hover) and (pointer: fine) {
+    .game-menu-button:hover {
+        width: 100%;
+        margin: 5%;
+        border: none;
+        background-color: white;
+        color: black;
+    }
 }
 
 .hamburger-text {

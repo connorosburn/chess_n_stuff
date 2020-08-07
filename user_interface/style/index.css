@@ -92,9 +92,16 @@ button, input[type=submit] {
     border: 1px solid white;
 }
 
-.selected-button, button:hover, input[type=submit]:hover {
+.selected-button {
     background-color: white;
     color: black;
+}
+
+@media(hover: hover) and (pointer: fine) {
+    button:hover, input[type=submit]:hover {
+        background-color: white;
+        color: black;
+    }
 }
 
 .login-register {
