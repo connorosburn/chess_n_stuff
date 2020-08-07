@@ -15,7 +15,7 @@ function UserInterface(props) {
     const[loginChecked, setLoginChecked] = useState(false);
     const[activeGameConfig, setActiveGameConfig] = useState(null);
     const[resetGame, setResetGame] = useState(false);
-    const[gameType, setGameType] = useState('checkers');
+    const[gameType, setGameType] = useState('chess');
 
     useEffect(() => {
         const loginCheck = async () => {
@@ -113,6 +113,7 @@ function UserInterface(props) {
                     selected={displayMode}
                     setDisplayMode={setDisplayMode}
                     userInfo={userInfo}
+                    gameType={gameType}
                     logout={async () => {
                             setUserInfo(null)
                             setActiveGameConfig(null)
