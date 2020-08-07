@@ -15,9 +15,13 @@
     flex: 1;
     font-size: 100%;
     text-align: center;
-    display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.game-label-text {
+    font-size: 50%;
+    margin-top: 5%;
 }
 
 .left-margin {
