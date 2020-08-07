@@ -5,6 +5,23 @@ function CheckersGame(props) {
     const [jumpTrack, setJumpTrack] = useState(null);
     const [selectedTile, setSelectedTile] = useState(null);
     const [inverted, setInverted] = useState(false);
+    const [changedTiles, setChangedTiles] = useState([]);
+
+    const diffTiles = (board, diffBoard) => {
+        let differences = [];
+        board.forEach((row, y) => {
+            row.forEach((tile, x) => {
+                let diffTile = diffBoard[y][x];
+                let newTile = tile;
+                if(diffTile.type != newTile.type || diffTile.player != newTile.player) {
+                    differences.push({x: x, y: y});
+                }
+            });
+        });
+        if(differences.length > 0) {
+            setChangedTiles(differences);
+        }
+    }
 
     const deepBoardCopy = (board) => {
         return board.map((row) => {
@@ -13,17 +30,30 @@ function CheckersGame(props) {
     }
 
     useEffect(() => {
-        console.log(props.gameData.snapshot.board);
-        const board = deepBoardCopy(props.gameData.snapshot.board);
         setSelectedTile(null);
-        setRenderBoard(board);
+        if(inverted) {
+            if(renderBoard) {
+                diffTiles(invertBoard(renderBoard), props.gameData.snapshot.board);
+            }
+            setRenderBoard(invertBoard(props.gameData.snapshot.board));
+        } else {
+            if(renderBoard) {
+                diffTiles(renderBoard, props.gameData.snapshot.board);
+            }
+            setRenderBoard(deepBoardCopy(props.gameData.snapshot.board));
+        }
     }, [props.gameData]);
 
     useEffect(() => {
         if(jumpTrack) {
             const jump = deepestJump();
             if(jump.childJumps.length > 0) {
-                let board = deepBoardCopy(renderBoard);
+                let board;
+                if(inverted) {
+                    board = invertBoard(renderBoard);
+                } else {
+                    board = deepBoardCopy(renderBoard);
+                }
                 board[jump.destinationPosition.y][jump.destinationPosition.x] = board[jump.currentPosition.y][jump.currentPosition.x];
                 board[jump.currentPosition.y][jump.currentPosition.x] = {
                     player: 'null',
@@ -33,7 +63,11 @@ function CheckersGame(props) {
                     player: 'null',
                     type: 'null'
                 };
-                setRenderBoard(board);
+                if(inverted) {
+                    setRenderBoard(invertBoard(board));
+                } else {
+                    setRenderBoard(board);
+                }
             } else {
                 props.sendMove({
                     start: {x: selectedTile.x, y: selectedTile.y},
@@ -154,12 +188,22 @@ function CheckersGame(props) {
         return validStart(x, y) || validJump(x, y) || standardMove(x, y);
     }
 
+    const tileChanged = (x, y) => {
+        let changed = false;
+        changedTiles.forEach((tile) => {
+            changed = changed || (tile.x == x && tile.y == y);
+        });
+        return changed;
+    }
+
     const tileClass = (x, y) => {
         let className = '';
         if(tileSelected(x, y)) {
             className = 'selected-tile';
         } else if(tileSelectable(x, y)) {
             className = 'selectable-tile';
+        } else if(tileChanged(x, y)) {
+            className = 'changed-tile';
         } else if((x + y) % 2 == 0) {
             className = 'light-tile';
         } else {
@@ -175,7 +219,11 @@ function CheckersGame(props) {
             setSelectedTile(null);
             if(jumpTrack) {
                 setJumpTrack(null);
-                setRenderBoard(deepBoardCopy(props.gameData.snapshot.board));
+                if(inverted) {
+                    setRenderBoard(invertBoard(props.gameData.snapshot.board));
+                } else {
+                    setRenderBoard(deepBoardCopy(props.gameData.snapshot.board));
+                }
             }
         } else if(standardMove(x, y)) {
             props.sendMove({
@@ -214,34 +262,58 @@ function CheckersGame(props) {
         }
     }
 
+    const invertBoard = (board) => {
+        let invertedBoard = [...board]
+        invertedBoard = invertedBoard.map((row) => {
+            let revRow = [...row];
+            revRow.reverse();
+            return revRow;
+        });
+        invertedBoard.reverse();
+        return invertedBoard;
+    }
+
+    const toggleInversion = () => {
+        setInverted(!inverted);
+        setRenderBoard(invertBoard(renderBoard));
+    }
+
     if(renderBoard) {
         return (
             <div className="grid-container">
-                {renderBoard.map((row, y) => {
-                    if(inverted) {
-                        y = renderBoard.length - 1 - y;
-                    }
-                    return (
-                        row.map((piece, x) => {
-                            if(inverted) {
-                                x = renderBoard[y].length - 1 - x;
-                            }
-                            return (
-                                <button 
-                                    className={`grid-tile-${row.length} ${tileClass(x, y)}`}
-                                    onClick={() => clickTile(x, y)}
-                                    key={x}
-                                >
-                                    <div className={`grid-content ${piece.player}-text`}>
-                                        {pieceCharacter(piece)}
-                                    </div>
-                                    {kingLabel(piece)}
-                                </button>
-                            );
-                        })
-                    );
-                        
-                })}
+                <div className="grid-container">
+                    {renderBoard.map((row, y) => {
+                        if(inverted) {
+                            y = renderBoard.length - 1 - y;
+                        }
+                        return (
+                            row.map((piece, x) => {
+                                if(inverted) {
+                                    x = renderBoard[y].length - 1 - x;
+                                }
+                                return (
+                                    <button 
+                                        className={`grid-tile-${row.length} ${tileClass(x, y)}`}
+                                        onClick={() => clickTile(x, y)}
+                                        key={x}
+                                    >
+                                        <div className={`grid-content ${piece.player}-text`}>
+                                            {pieceCharacter(piece)}
+                                        </div>
+                                        {kingLabel(piece)}
+                                    </button>
+                                );
+                            })
+                        );
+                            
+                    })}
+                </div>
+                <button 
+                    onClick={toggleInversion}
+                    className="inversion-button"
+                >
+                    Invert Board
+                </button>
             </div>
         );
     }

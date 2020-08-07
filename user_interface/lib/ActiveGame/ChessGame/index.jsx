@@ -143,6 +143,7 @@ function ChessGame(props) {
             {displayChessGame()}
             <button 
                 onClick={toggleInversion}
+                className="inversion-button"
             >
                 Invert Board
             </button>
