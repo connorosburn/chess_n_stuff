@@ -2,6 +2,7 @@
 #define GAME_HPP
 #include <string>
 #include <map>
+#include <vector>
 
 enum class Player {White, Black, Null};
 
