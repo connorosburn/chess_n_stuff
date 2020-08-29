@@ -1,4 +1,4 @@
-# Chess app rough cut
+# Chess N' Stuff
 
 ## Hosted live
 https://playchessnstuff.com
