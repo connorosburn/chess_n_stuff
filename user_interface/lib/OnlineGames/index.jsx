@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import LiveGameListener from '../request/socket.js';
-import {getGames} from '../request/fetch';
+import {getGames} from '../request';
 
 function OnlineGames(props) {
     const[gameData, setGameData] = useState({});

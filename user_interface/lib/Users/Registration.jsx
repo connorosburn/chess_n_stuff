@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {register} from '../request/fetch';
+import {register} from '../request';
 
 function Registration(props) {
     const[username, setUsername] = useState('');

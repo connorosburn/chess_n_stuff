@@ -3,7 +3,7 @@ import ChessGame from './ChessGame';
 import TicTacToeGame from './TicTacToeGame';
 import ConnectFourGame from './ConnectFourGame';
 import CheckersGame from './CheckersGame';
-import {startOnlineGame, sendOnlineMove} from '../request/fetch'
+import {startOnlineGame, sendOnlineMove} from '../request'
 
 function ActiveGame(props) {
     const[gameData, setGameData] = useState(null);

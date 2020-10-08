@@ -17,7 +17,7 @@ function ChessGame(props) {
         if(inverted && renderBoard) {
             const realBoard = invertBoard(renderBoard);
             diffTiles(board, realBoard);
-            setRenderBoard(invertBoard(board));
+            setRenderBoard(board => invertBoard(board));
         } else if(!inverted && renderBoard) {
             diffTiles(board, renderBoard);
             setRenderBoard(board);

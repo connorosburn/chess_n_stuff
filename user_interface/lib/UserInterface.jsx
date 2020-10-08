@@ -6,7 +6,7 @@ import MenuBar from './MenuBar';
 import Registration from './Users/Registration.jsx';
 import Login from './Users/Login.jsx';
 import OnlineGames from './OnlineGames';
-import {checkLogin, logout, getGame} from './request/fetch'
+import {checkLogin, logout, getGame} from './request'
 import GameMenu from './GameMenu';
 
 function UserInterface(props) {

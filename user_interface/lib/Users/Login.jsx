@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {login} from '../request/fetch'
+import {login} from '../request'
 
 function Login(props) {
     const[username, setUsername] = useState('');
